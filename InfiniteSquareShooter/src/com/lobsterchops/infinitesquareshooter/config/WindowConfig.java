@@ -8,5 +8,4 @@ public final class WindowConfig {
 	public WindowConfig() {
 		
 	}
-
 }
