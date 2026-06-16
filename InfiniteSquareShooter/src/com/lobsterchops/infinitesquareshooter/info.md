@@ -1,6 +1,8 @@
 # Infinite Square Shooter
 ## Game Design Document
 
+Date: June 2026
+
 ---
 
 ## Overview
