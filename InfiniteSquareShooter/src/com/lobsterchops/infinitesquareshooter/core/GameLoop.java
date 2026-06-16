@@ -15,10 +15,10 @@ public class GameLoop {
 	}
 	
 	public void run() {
-	    double delta = 0.0;
-	    long lastTime = System.nanoTime();
-	    long timer = 0L;
-	    int frameCount = 0;  // add this
+	    double delta = 0.0; // accumulates time to determine when to update/render
+	    long lastTime = System.nanoTime(); // tracks the last time we updated/rendered
+	    long timer = 0L; // accumulates time for FPS calculation
+	    int frameCount = 0; // counts frames rendered in the current second
 
 	    while (running) {
 	        long currentTime = System.nanoTime();
