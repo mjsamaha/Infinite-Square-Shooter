@@ -13,6 +13,7 @@ public final class GameConfig {
 	public static final long TIMER_INTERVAL = TIMER_INTERVAL_NANOS;
 
 	private GameConfig() {
+		
 	}
 
 }

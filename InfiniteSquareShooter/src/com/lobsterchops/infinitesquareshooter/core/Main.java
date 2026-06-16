@@ -1,7 +1,6 @@
 package com.lobsterchops.infinitesquareshooter.core;
 
 import javax.swing.JFrame;
-import javax.swing.SwingUtilities;
 
 import com.lobsterchops.infinitesquareshooter.config.WindowConfig;
 

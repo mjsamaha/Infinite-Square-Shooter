@@ -7,7 +7,7 @@ import java.awt.Graphics2D;
 import javax.swing.JPanel;
 
 import com.lobsterchops.infinitesquareshooter.config.ColorConfig;
-import com.lobsterchops.infinitesquareshooter.config.WindowConfig;
+import com.lobsterchops.infinitesquareshooter.config.ScreenConfig;
 
 public class GamePanel extends JPanel implements Runnable {
 	
@@ -31,7 +31,7 @@ public class GamePanel extends JPanel implements Runnable {
 	}
 	
 	private void initializePanel() {
-		this.setPreferredSize(new Dimension(WindowConfig.WIDTH, WindowConfig.HEIGHT));
+		this.setPreferredSize(new Dimension(ScreenConfig.WIDTH, ScreenConfig.HEIGHT));
 		this.setBackground(ColorConfig.BLACK);
 		this.setDoubleBuffered(true);
 		this.setFocusable(true);
