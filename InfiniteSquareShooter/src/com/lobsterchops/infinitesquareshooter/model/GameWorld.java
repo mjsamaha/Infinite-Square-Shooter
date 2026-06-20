@@ -17,17 +17,25 @@ public class GameWorld {
 	private GameState state = GameState.PLAYING;
 	private int waveNumber = 1;
 	private int score = 0;
+	
+	private long tick;
+	private long elapsedMillis;
 
 	public void update() {
 		if (state != GameState.PLAYING) {
 			return;
 		}
 
+		tick++;
+		elapsedMillis += Math.round(1000f / com.lobsterchops.infinitesquareshooter.config.GameConfig.TARGET_FPS);
+
+		UpdateContext context = UpdateContext.fixed(this, tick, elapsedMillis);
+
 		flushPendingObjects();
 
 		for (GameObject object : objects) {
 			if (object.isActive()) {
-				object.update(this);
+				object.update(context);
 			}
 		}
 
@@ -79,6 +87,8 @@ public class GameWorld {
 		player = null;
 		score = 0;
 		waveNumber = 1;
+		tick = 0;
+		elapsedMillis = 0;
 		state = GameState.PLAYING;
 	}
 
@@ -117,5 +127,13 @@ public class GameWorld {
 
 	private void removeInactiveObjects() {
 		objects.removeIf(object -> !object.isActive());
+	}
+	
+	public long getTick() {
+		return tick;
+	}
+
+	public long getElapsedMillis() {
+		return elapsedMillis;
 	}
 }

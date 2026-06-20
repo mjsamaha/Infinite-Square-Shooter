@@ -11,6 +11,7 @@ import com.lobsterchops.infinitesquareshooter.math.Vector2;
 import com.lobsterchops.infinitesquareshooter.model.Damageable;
 import com.lobsterchops.infinitesquareshooter.model.Entity;
 import com.lobsterchops.infinitesquareshooter.model.GameWorld;
+import com.lobsterchops.infinitesquareshooter.model.UpdateContext;
 import com.lobsterchops.infinitesquareshooter.state.GameState;
 
 public class Player extends Entity implements Damageable {
@@ -21,6 +22,7 @@ public class Player extends Entity implements Damageable {
 	private int lives;
 	private long lastShotTime;
 	private long invincibleUntil;
+	private boolean invincible;
 
 	public Player(Vector2 position, InputHandler input) {
 		super(position, 32f, 32f);
@@ -30,11 +32,11 @@ public class Player extends Entity implements Damageable {
 	}
 
 	@Override
-	public void update(GameWorld world) {
+	public void update(UpdateContext context) {
 		Vector2 movement = input.movementDirection().multiply(stats.moveSpeed());
 		setVelocity(movement);
 
-		super.update(world);
+		super.update(context);
 
 		float halfWidth = getWidth() / 2f;
 		float halfHeight = getHeight() / 2f;
@@ -46,11 +48,13 @@ public class Player extends Entity implements Damageable {
 				ScreenConfig.HEIGHT - halfHeight
 		));
 
-		fireIfReady(world);
+		fireIfReady(context);
+
+		invincible = context.elapsedMillis() < invincibleUntil;
 	}
 
-	private void fireIfReady(GameWorld world) {
-		long now = System.currentTimeMillis();
+	private void fireIfReady(UpdateContext context) {
+		long now = context.elapsedMillis();
 
 		if (now - lastShotTime < stats.projectile().cooldownMs()) {
 			return;
@@ -62,14 +66,12 @@ public class Player extends Entity implements Damageable {
 			return;
 		}
 
-		world.getSpawnService().spawnPlayerProjectile(getPosition(), direction, stats.projectile());
+		context.spawnService().spawnPlayerProjectile(getPosition(), direction, stats.projectile());
 		lastShotTime = now;
 	}
 
 	@Override
 	public void render(Graphics2D g2) {
-		boolean invincible = System.currentTimeMillis() < invincibleUntil;
-
 		g2.setColor(invincible ? ColorConfig.PLAYER_INVINCIBLE : ColorConfig.PLAYER);
 		g2.fillRect(
 				Math.round(getBounds().x()),
@@ -80,8 +82,8 @@ public class Player extends Entity implements Damageable {
 	}
 
 	@Override
-	public void takeDamage(int damage) {
-		long now = System.currentTimeMillis();
+	public void takeDamage(int damage, UpdateContext context) {
+		long now = context.elapsedMillis();
 
 		if (now < invincibleUntil || isDead()) {
 			return;

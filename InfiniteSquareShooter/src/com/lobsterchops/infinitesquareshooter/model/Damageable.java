@@ -2,7 +2,7 @@ package com.lobsterchops.infinitesquareshooter.model;
 
 public interface Damageable {
 	
-	void takeDamage(int damage);
+	void takeDamage(int damage, UpdateContext context);
 	
 	int getCurrentHealth();
 	

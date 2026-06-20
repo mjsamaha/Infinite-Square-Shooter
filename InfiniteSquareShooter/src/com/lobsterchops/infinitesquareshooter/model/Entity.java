@@ -19,7 +19,7 @@ public abstract class Entity implements GameObject, Collidable, Renderable {
 	}
 
 	@Override
-	public void update(GameWorld world) {
+	public void update(UpdateContext context) {
 		position = position.add(velocity);
 	}
 

@@ -6,7 +6,7 @@ import java.awt.Graphics2D;
 import com.lobsterchops.infinitesquareshooter.config.ColorConfig;
 import com.lobsterchops.infinitesquareshooter.math.Vector2;
 import com.lobsterchops.infinitesquareshooter.model.Entity;
-import com.lobsterchops.infinitesquareshooter.model.GameWorld;
+import com.lobsterchops.infinitesquareshooter.model.UpdateContext;
 
 public class Projectile extends Entity {
 
@@ -21,12 +21,13 @@ public class Projectile extends Entity {
 	}
 
 	@Override
-	public void update(GameWorld world) {
-		super.update(world);
+	public void update(UpdateContext context) {
+		super.update(context);
 
 		Vector2 position = getPosition();
 
-		if (position.x() < -20 || position.x() > com.lobsterchops.infinitesquareshooter.config.ScreenConfig.WIDTH + 20
+		if (position.x() < -20
+				|| position.x() > com.lobsterchops.infinitesquareshooter.config.ScreenConfig.WIDTH + 20
 				|| position.y() < -20
 				|| position.y() > com.lobsterchops.infinitesquareshooter.config.ScreenConfig.HEIGHT + 20) {
 			markInactive();
