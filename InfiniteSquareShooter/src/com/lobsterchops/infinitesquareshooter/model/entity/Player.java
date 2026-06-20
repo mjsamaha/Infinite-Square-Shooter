@@ -2,6 +2,8 @@ package com.lobsterchops.infinitesquareshooter.model.entity;
 
 import java.awt.Graphics2D;
 
+import com.lobsterchops.infinitesquareshooter.combat.Team;
+import com.lobsterchops.infinitesquareshooter.combat.TeamMember;
 import com.lobsterchops.infinitesquareshooter.config.ColorConfig;
 import com.lobsterchops.infinitesquareshooter.config.ConfigRegistry;
 import com.lobsterchops.infinitesquareshooter.config.ScreenConfig;
@@ -14,7 +16,7 @@ import com.lobsterchops.infinitesquareshooter.model.GameWorld;
 import com.lobsterchops.infinitesquareshooter.model.UpdateContext;
 import com.lobsterchops.infinitesquareshooter.state.GameState;
 
-public class Player extends Entity implements Damageable {
+public class Player extends Entity implements Damageable, TeamMember {
 
 	private PlayerStats stats;
 	private final InputHandler input;
@@ -97,20 +99,25 @@ public class Player extends Entity implements Damageable {
 			markInactive();
 		}
 	}
-
+	
 	@Override
-	public int getCurrentHealth() {
+	public int getCurrentHp() {
 		return lives;
 	}
 
 	@Override
-	public int getMaxHealth() {
+	public int getMaxHp() {
 		return stats.maxLives();
 	}
 
 	@Override
 	public boolean isDead() {
 		return lives <= 0;
+	}
+	
+	@Override
+	public Team getTeam() {
+		return Team.PLAYER;
 	}
 
 	public void applyStats(PlayerStats newStats) {

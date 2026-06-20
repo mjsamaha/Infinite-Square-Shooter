@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import com.lobsterchops.infinitesquareshooter.collision.CollisionSystem;
+import com.lobsterchops.infinitesquareshooter.combat.DamageSystem;
 import com.lobsterchops.infinitesquareshooter.model.entity.Player;
 import com.lobsterchops.infinitesquareshooter.state.GameState;
 
@@ -12,6 +14,7 @@ public class GameWorld {
 	private final List<GameObject> objects = new ArrayList<>();
 	private final List<GameObject> pendingObjects = new ArrayList<>();
 	private final SpawnService spawnService = new SpawnService(this);
+	private final CollisionSystem collisionSystem = new CollisionSystem(new DamageSystem());
 
 	private Player player;
 	private GameState state = GameState.PLAYING;
@@ -38,6 +41,8 @@ public class GameWorld {
 				object.update(context);
 			}
 		}
+		
+		collisionSystem.update(context);
 
 		if (player != null) {
 			player.handleDeath(this);

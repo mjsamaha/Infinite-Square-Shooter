@@ -3,13 +3,16 @@ package com.lobsterchops.infinitesquareshooter.model.projectile;
 import java.awt.Color;
 import java.awt.Graphics2D;
 
+import com.lobsterchops.infinitesquareshooter.combat.DamageSource;
+import com.lobsterchops.infinitesquareshooter.combat.Team;
 import com.lobsterchops.infinitesquareshooter.config.ColorConfig;
 import com.lobsterchops.infinitesquareshooter.math.Vector2;
+import com.lobsterchops.infinitesquareshooter.model.Damageable;
 import com.lobsterchops.infinitesquareshooter.model.Entity;
 import com.lobsterchops.infinitesquareshooter.model.UpdateContext;
 import com.lobsterchops.infinitesquareshooter.render.RenderLayer;
 
-public class Projectile extends Entity {
+public class Projectile extends Entity implements DamageSource {
 
 	private final int damage;
 	private final ProjectileOwner owner;
@@ -48,9 +51,20 @@ public class Projectile extends Entity {
 	public RenderLayer getRenderLayer() {
 		return RenderLayer.PROJECTILES;
 	}
+	
+	@Override
+	public Team getTeam() {
+		return owner == ProjectileOwner.PLAYER ? Team.PLAYER : Team.ENEMY;
+	}
 
+	@Override
 	public int getDamage() {
 		return damage;
+	}
+
+	@Override
+	public void onDamageApplied(Damageable target, UpdateContext context) {
+		markInactive();
 	}
 
 	public ProjectileOwner getOwner() {
