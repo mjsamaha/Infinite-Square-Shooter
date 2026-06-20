@@ -12,6 +12,8 @@ import com.lobsterchops.infinitesquareshooter.math.Vector2;
 import com.lobsterchops.infinitesquareshooter.model.entity.Player;
 import com.lobsterchops.infinitesquareshooter.state.GameState;
 import com.lobsterchops.infinitesquareshooter.system.EnemyDeathSystem;
+import com.lobsterchops.infinitesquareshooter.model.entity.Enemy;
+import com.lobsterchops.infinitesquareshooter.wave.WaveManager;
 
 public class GameWorld {
 
@@ -20,6 +22,8 @@ public class GameWorld {
 	private final SpawnService spawnService = new SpawnService(this);
 	private final CollisionSystem collisionSystem = new CollisionSystem(new DamageSystem());
 	private final EnemyDeathSystem enemyDeathSystem = new EnemyDeathSystem();
+	
+	private final WaveManager waveManager = new WaveManager(this);
 
 	private Player player;
 	private GameState state = GameState.PLAYING;
@@ -54,7 +58,11 @@ public class GameWorld {
 			player.handleDeath(this);
 		}
 
+		flushPendingObjects();
 		removeInactiveObjects();
+
+		waveManager.update(context);
+
 	}
 
 	public void addObject(GameObject object) {
@@ -91,6 +99,16 @@ public class GameWorld {
 
 		return renderables;
 	}
+	
+	public boolean hasActiveEnemies() {
+		for (GameObject object : objects) {
+			if (object instanceof Enemy && object.isActive()) {
+				return true;
+			}
+		}
+
+		return false;
+	}
 
 	public void clear() {
 		objects.clear();
@@ -101,6 +119,7 @@ public class GameWorld {
 		tick = 0;
 		elapsedMillis = 0;
 		state = GameState.PLAYING;
+		waveManager.reset(elapsedMillis);
 	}
 	
 	public void spawnTestEnemy() {
@@ -109,6 +128,8 @@ public class GameWorld {
 				new Vector2 (100f, 100f)
 		);
 	}
+	
+
 
 	public GameState getState() {
 		return state;
@@ -153,5 +174,9 @@ public class GameWorld {
 
 	public long getElapsedMillis() {
 		return elapsedMillis;
+	}
+	
+	public WaveManager getWaveManager() {
+		return waveManager;
 	}
 }
