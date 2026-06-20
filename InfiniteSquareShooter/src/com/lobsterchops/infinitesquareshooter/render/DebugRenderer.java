@@ -42,7 +42,8 @@ public class DebugRenderer {
 		for (GameObject object : world.getObjects()) {
 			if (object instanceof Collidable collidable && object.isActive()) {
 				Bounds bounds = collidable.getBounds();
-
+				
+				// Draw hitbox outline
 				g2.drawRect(
 						Math.round(bounds.x()),
 						Math.round(bounds.y()),

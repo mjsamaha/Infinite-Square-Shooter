@@ -1,17 +1,21 @@
 package com.lobsterchops.infinitesquareshooter.core;
 
 import com.lobsterchops.infinitesquareshooter.config.GameConfig;
+import com.lobsterchops.infinitesquareshooter.render.DebugMetrics;
 
 public class GameLoop {
 
 	private final Runnable updateTick;
 	private final Runnable requestRepaint;
+	
+	private final DebugMetrics debugMetrics;
 
 	private volatile boolean running = true;
 
-	public GameLoop(Runnable updateTick, Runnable requestRepaint) {
+	public GameLoop(Runnable updateTick, Runnable requestRepaint, DebugMetrics debugMetrics) {
 		this.updateTick = updateTick;
 		this.requestRepaint = requestRepaint;
+		this.debugMetrics = debugMetrics;
 	}
 
 	public void run() {
@@ -36,8 +40,8 @@ public class GameLoop {
 			}
 
 			if (timer >= GameConfig.TIMER_INTERVAL) {
-				System.out.println("FPS: " + frameCount); // real FPS over 1 second
-				frameCount = 0; // reset for next second
+				debugMetrics.setFps(frameCount); 
+				frameCount = 0;
 				timer = 0L;
 			}
 		}

@@ -15,6 +15,8 @@ public class InputHandler implements KeyListener, MouseMotionListener {
 	private boolean rightPressed;
 	private boolean pausePressed;
 	private boolean restartPressed;
+	
+	private boolean debugToggleRequested;
 
 	private Vector2 mousePosition = Vector2.ZERO;
 
@@ -28,6 +30,7 @@ public class InputHandler implements KeyListener, MouseMotionListener {
 		if (code == KeyEvent.VK_D) rightPressed = true;
 		if (code == KeyEvent.VK_ESCAPE) pausePressed = true;
 		if (code == KeyEvent.VK_R) restartPressed = true;
+		if (code == KeyEvent.VK_F3) debugToggleRequested = true;
 	}
 
 	@Override
@@ -66,6 +69,15 @@ public class InputHandler implements KeyListener, MouseMotionListener {
 		if (downPressed) y++;
 
 		return new Vector2(x, y).normalized();
+	}
+	
+	public boolean consumeDebugToggleRequest() {
+		if (!debugToggleRequested) {
+			return false;
+		}
+
+		debugToggleRequested = false;
+		return true;
 	}
 
 	public Vector2 getMousePosition() {

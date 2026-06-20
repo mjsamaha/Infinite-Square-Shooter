@@ -6,17 +6,24 @@ import com.lobsterchops.infinitesquareshooter.manager.GameUpdater;
 import com.lobsterchops.infinitesquareshooter.math.Vector2;
 import com.lobsterchops.infinitesquareshooter.model.GameWorld;
 import com.lobsterchops.infinitesquareshooter.model.entity.Player;
+import com.lobsterchops.infinitesquareshooter.render.DebugMetrics;
+import com.lobsterchops.infinitesquareshooter.render.RenderPipeline;
 
 public class GameContext {
 
 	private final InputHandler inputHandler;
 	private final GameWorld world;
 	private final GameUpdater updater;
+	
+	private final DebugMetrics debugMetrics;
+	private final RenderPipeline renderPipeline;
 
 	public GameContext() {
 		this.inputHandler = new InputHandler();
 		this.world = new GameWorld();
-		this.updater = new GameUpdater(world);
+		this.debugMetrics = new DebugMetrics();
+		this.renderPipeline = new RenderPipeline(world, debugMetrics);
+		this.updater = new GameUpdater(world, inputHandler, renderPipeline);
 	}
 
 	public void setupNewRun() {
@@ -35,5 +42,13 @@ public class GameContext {
 
 	public GameUpdater getUpdater() {
 		return updater;
+	}
+	
+	public RenderPipeline getRenderPipeline() {
+		return renderPipeline;
+	}
+
+	public DebugMetrics getDebugMetrics() {
+		return debugMetrics;
 	}
 }

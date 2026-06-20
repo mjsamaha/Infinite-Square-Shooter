@@ -9,7 +9,7 @@ import com.lobsterchops.infinitesquareshooter.model.entity.Player;
 
 public class HudRenderer {
 	
-	private static final Font HUD_FONT = new Font("Arial", Font.BOLD, 18);
+	private static final Font HUD_FONT = new Font("Arial", Font.BOLD, 16);
 
 	public void render(Graphics2D g2, GameWorld world) {
 		g2.setFont(HUD_FONT);
