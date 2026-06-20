@@ -89,7 +89,7 @@ public final class ConfigRegistry {
 
 	// Player Map
 	private static final PlayerStats PLAYER_STATS = new PlayerStats(3, // startingLives
-			4.0f, // moveSpeed
+			5.0f, // moveSpeed
 			1500L, // invincibilityMs
 			ProjectileStats.single(10f, 1, 150L), // default projectile
 			5 // maxLives (power-up cap)
