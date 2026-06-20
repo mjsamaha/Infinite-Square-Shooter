@@ -27,7 +27,8 @@ public class GamePanel extends JPanel implements Runnable {
 			this::repaint
 		);
 		
-		// this.addKeyListener(context.getInputHandler());
+		this.addKeyListener(context.getInputHandler());
+		this.addMouseMotionListener(context.getInputHandler());
 	}
 	
 	private void initializePanel() {
@@ -38,7 +39,7 @@ public class GamePanel extends JPanel implements Runnable {
 	}
 	
 	public void setupGame() {
-		// later
+		context.setupNewRun();
 	}
 	
 	public void startGameThread() {
@@ -59,12 +60,17 @@ public class GamePanel extends JPanel implements Runnable {
 	}
 	
 	@Override
-    protected void paintComponent(Graphics g) {
-        super.paintComponent(g);
-        Graphics2D g2 = (Graphics2D) g;
-        //context.getRenderPipeline().render(g2);
-        g2.dispose();
-    }
+	protected void paintComponent(Graphics g) {
+		super.paintComponent(g);
+		Graphics2D g2 = (Graphics2D) g;
+
+		for (com.lobsterchops.infinitesquareshooter.model.Renderable renderable
+				: context.getWorld().getRenderableObjects()) {
+			renderable.render(g2);
+		}
+
+		g2.dispose();
+	}
 
     public GameContext getContext() {
         return context;

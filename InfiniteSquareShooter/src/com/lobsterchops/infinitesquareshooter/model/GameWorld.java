@@ -4,13 +4,16 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import com.lobsterchops.infinitesquareshooter.model.entity.Player;
 import com.lobsterchops.infinitesquareshooter.state.GameState;
 
 public class GameWorld {
 
 	private final List<GameObject> objects = new ArrayList<>();
 	private final List<GameObject> pendingObjects = new ArrayList<>();
+	private final SpawnService spawnService = new SpawnService(this);
 
+	private Player player;
 	private GameState state = GameState.PLAYING;
 	private int waveNumber = 1;
 	private int score = 0;
@@ -28,6 +31,10 @@ public class GameWorld {
 			}
 		}
 
+		if (player != null) {
+			player.handleDeath(this);
+		}
+
 		removeInactiveObjects();
 	}
 
@@ -35,6 +42,19 @@ public class GameWorld {
 		if (object != null) {
 			pendingObjects.add(object);
 		}
+	}
+
+	public void setPlayer(Player player) {
+		this.player = player;
+		addObject(player);
+	}
+
+	public Player getPlayer() {
+		return player;
+	}
+
+	public SpawnService getSpawnService() {
+		return spawnService;
 	}
 
 	public List<GameObject> getObjects() {
@@ -56,6 +76,7 @@ public class GameWorld {
 	public void clear() {
 		objects.clear();
 		pendingObjects.clear();
+		player = null;
 		score = 0;
 		waveNumber = 1;
 		state = GameState.PLAYING;
