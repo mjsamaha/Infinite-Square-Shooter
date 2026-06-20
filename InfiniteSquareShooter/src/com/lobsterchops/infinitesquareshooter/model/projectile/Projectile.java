@@ -14,47 +14,72 @@ import com.lobsterchops.infinitesquareshooter.render.RenderLayer;
 
 public class Projectile extends Entity implements DamageSource {
 
+	private static final long DEFAULT_LIFESPAN_MS = 3000L;
+
 	private final int damage;
 	private final ProjectileOwner owner;
+	private final boolean homing;
+	private final float homingTurnRate;
+	private final long lifespanMs;
+
+	private long spawnedAt;
 
 	public Projectile(Vector2 position, Vector2 velocity, int damage, ProjectileOwner owner) {
-		super(position, 6f, 6f);
+		this(position, velocity, damage, owner, false, 0f, DEFAULT_LIFESPAN_MS, 6f);
+	}
+
+	public Projectile(Vector2 position, Vector2 velocity, int damage, ProjectileOwner owner,
+			boolean homing, float homingTurnRate) {
+		this(position, velocity, damage, owner, homing, homingTurnRate, DEFAULT_LIFESPAN_MS, 6f);
+	}
+
+	public Projectile(Vector2 position, Vector2 velocity, int damage, ProjectileOwner owner,
+			boolean homing, float homingTurnRate, long lifespanMs, float size) {
+		super(position, size, size);
 		this.damage = damage;
 		this.owner = owner;
+		this.homing = homing;
+		this.homingTurnRate = homingTurnRate;
+		this.lifespanMs = lifespanMs;
 		setVelocity(velocity);
 	}
 
 	@Override
 	public void update(UpdateContext context) {
+		if (spawnedAt == 0L) {
+			spawnedAt = context.elapsedMillis();
+		}
+
+		if (isExpired(context)) {
+			markInactive();
+			return;
+		}
+
+		if (homing && owner == ProjectileOwner.ENEMY && context.world().getPlayer() != null) {
+			steerTowardPlayer(context);
+		}
+
 		super.update(context);
 
-		Vector2 position = getPosition();
-
-		if (position.x() < -20
-				|| position.x() > com.lobsterchops.infinitesquareshooter.config.ScreenConfig.WIDTH + 20
-				|| position.y() < -20
-				|| position.y() > com.lobsterchops.infinitesquareshooter.config.ScreenConfig.HEIGHT + 20) {
+		if (isOffscreen()) {
 			markInactive();
 		}
 	}
 
 	@Override
 	public void render(Graphics2D g2) {
-		Color color = owner == ProjectileOwner.PLAYER ? ColorConfig.PLAYER_PROJECTILE : ColorConfig.PROJECTILE_ENEMY;
+		g2.setColor(ProjectileVisualResolver.colorFor(this));
+		g2.fillOval(
+				Math.round(getBounds().x()),
+				Math.round(getBounds().y()),
+				Math.round(getBounds().width()),
+				Math.round(getBounds().height())
+		);
+	}
 
-		g2.setColor(color);
-		g2.fillOval(Math.round(getBounds().x()), Math.round(getBounds().y()), Math.round(getBounds().width()),
-				Math.round(getBounds().height()));
-	}
-	
-	@Override
-	public RenderLayer getRenderLayer() {
-		return RenderLayer.PROJECTILES;
-	}
-	
 	@Override
 	public Team getTeam() {
-		return owner == ProjectileOwner.PLAYER ? Team.PLAYER : Team.ENEMY;
+		return owner.getTeam();
 	}
 
 	@Override
@@ -67,7 +92,50 @@ public class Projectile extends Entity implements DamageSource {
 		markInactive();
 	}
 
+	@Override
+	public RenderLayer getRenderLayer() {
+		return RenderLayer.PROJECTILES;
+	}
+
+	private void steerTowardPlayer(UpdateContext context) {
+		Vector2 targetDirection = getPosition()
+				.directionTo(context.world().getPlayer().getPosition());
+
+		Vector2 currentDirection = getVelocity().normalized();
+		Vector2 blendedDirection = currentDirection
+				.multiply(1f - homingTurnRate)
+				.add(targetDirection.multiply(homingTurnRate))
+				.normalized();
+
+		setVelocity(blendedDirection.multiply(getVelocity().length()));
+	}
+
+	private boolean isExpired(UpdateContext context) {
+		return lifespanMs > 0 && context.elapsedMillis() - spawnedAt >= lifespanMs;
+	}
+
+	private boolean isOffscreen() {
+		Vector2 position = getPosition();
+
+		return position.x() < -40
+				|| position.x() > com.lobsterchops.infinitesquareshooter.config.ScreenConfig.WIDTH + 40
+				|| position.y() < -40
+				|| position.y() > com.lobsterchops.infinitesquareshooter.config.ScreenConfig.HEIGHT + 40;
+	}
+
 	public ProjectileOwner getOwner() {
 		return owner;
+	}
+
+	public boolean isHoming() {
+		return homing;
+	}
+
+	public float getHomingTurnRate() {
+		return homingTurnRate;
+	}
+
+	public long getLifespanMs() {
+		return lifespanMs;
 	}
 }

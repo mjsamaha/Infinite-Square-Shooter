@@ -6,8 +6,12 @@ import java.util.List;
 
 import com.lobsterchops.infinitesquareshooter.collision.CollisionSystem;
 import com.lobsterchops.infinitesquareshooter.combat.DamageSystem;
+import com.lobsterchops.infinitesquareshooter.config.GameConfig;
+import com.lobsterchops.infinitesquareshooter.config.types.EnemyType;
+import com.lobsterchops.infinitesquareshooter.math.Vector2;
 import com.lobsterchops.infinitesquareshooter.model.entity.Player;
 import com.lobsterchops.infinitesquareshooter.state.GameState;
+import com.lobsterchops.infinitesquareshooter.system.EnemyDeathSystem;
 
 public class GameWorld {
 
@@ -15,6 +19,7 @@ public class GameWorld {
 	private final List<GameObject> pendingObjects = new ArrayList<>();
 	private final SpawnService spawnService = new SpawnService(this);
 	private final CollisionSystem collisionSystem = new CollisionSystem(new DamageSystem());
+	private final EnemyDeathSystem enemyDeathSystem = new EnemyDeathSystem();
 
 	private Player player;
 	private GameState state = GameState.PLAYING;
@@ -30,7 +35,7 @@ public class GameWorld {
 		}
 
 		tick++;
-		elapsedMillis += Math.round(1000f / com.lobsterchops.infinitesquareshooter.config.GameConfig.TARGET_FPS);
+		elapsedMillis += Math.round(1000f / GameConfig.TARGET_FPS);
 
 		UpdateContext context = UpdateContext.fixed(this, tick, elapsedMillis);
 
@@ -41,8 +46,9 @@ public class GameWorld {
 				object.update(context);
 			}
 		}
-		
+
 		collisionSystem.update(context);
+		enemyDeathSystem.update(context);
 
 		if (player != null) {
 			player.handleDeath(this);
@@ -95,6 +101,13 @@ public class GameWorld {
 		tick = 0;
 		elapsedMillis = 0;
 		state = GameState.PLAYING;
+	}
+	
+	public void spawnTestEnemy() {
+		spawnService.spawnEnemy(
+				EnemyType.BASIC_I,
+				new Vector2 (100f, 100f)
+		);
 	}
 
 	public GameState getState() {

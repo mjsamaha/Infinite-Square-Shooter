@@ -13,8 +13,6 @@ public class DamageSystem {
 
 		target.takeDamage(source.getDamage(), context);
 		source.onDamageApplied(target, context);
-
-		awardScoreIfKilled(target, context);
 	}
 
 	public void applyDamage(Damageable target, int damage, UpdateContext context) {
@@ -23,21 +21,5 @@ public class DamageSystem {
 		}
 
 		target.takeDamage(damage, context);
-
-		awardScoreIfKilled(target, context);
-	}
-
-	private void awardScoreIfKilled(Damageable target, UpdateContext context) {
-		if (!target.isDead()) {
-			return;
-		}
-
-		if (target instanceof ScoreValue scoreValue) {
-			context.world().addScore(scoreValue.getScoreValue());
-		}
-
-		if (target instanceof GameObject gameObject) {
-			gameObject.isActive();
-		}
 	}
 }

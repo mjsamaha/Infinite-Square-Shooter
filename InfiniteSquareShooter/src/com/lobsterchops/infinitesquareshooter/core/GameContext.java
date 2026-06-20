@@ -1,6 +1,7 @@
 package com.lobsterchops.infinitesquareshooter.core;
 
 import com.lobsterchops.infinitesquareshooter.config.ScreenConfig;
+import com.lobsterchops.infinitesquareshooter.config.types.EnemyType;
 import com.lobsterchops.infinitesquareshooter.input.InputHandler;
 import com.lobsterchops.infinitesquareshooter.manager.GameUpdater;
 import com.lobsterchops.infinitesquareshooter.math.Vector2;
@@ -30,6 +31,66 @@ public class GameContext {
 		Vector2 startPosition = new Vector2(ScreenConfig.WIDTH / 2f, ScreenConfig.HEIGHT / 2f);
 		Player player = new Player(startPosition, inputHandler);
 		world.setPlayer(player);
+		
+		world.getSpawnService().spawnEnemy(
+				com.lobsterchops.infinitesquareshooter.config.types.EnemyType.BASIC_I,
+				new com.lobsterchops.infinitesquareshooter.math.Vector2(120f, 120f)
+		);
+
+		world.getSpawnService().spawnEnemy(
+				com.lobsterchops.infinitesquareshooter.config.types.EnemyType.TANK_I,
+				new com.lobsterchops.infinitesquareshooter.math.Vector2(220f, 120f)
+		);
+
+		world.getSpawnService().spawnEnemy(
+				com.lobsterchops.infinitesquareshooter.config.types.EnemyType.SHOOTER_I,
+				new com.lobsterchops.infinitesquareshooter.math.Vector2(920f, 120f)
+		);
+
+		world.getSpawnService().spawnEnemy(
+				com.lobsterchops.infinitesquareshooter.config.types.EnemyType.SPREAD_I,
+				new com.lobsterchops.infinitesquareshooter.math.Vector2(920f, 240f)
+		);
+
+		world.getSpawnService().spawnEnemy(
+				com.lobsterchops.infinitesquareshooter.config.types.EnemyType.ZIGZAG_I,
+				new com.lobsterchops.infinitesquareshooter.math.Vector2(120f, 650f)
+		);
+
+		world.getSpawnService().spawnEnemy(
+				com.lobsterchops.infinitesquareshooter.config.types.EnemyType.DASHER_I,
+				new com.lobsterchops.infinitesquareshooter.math.Vector2(220f, 650f)
+		);
+
+		world.getSpawnService().spawnEnemy(
+				com.lobsterchops.infinitesquareshooter.config.types.EnemyType.ORBITER_I,
+				new com.lobsterchops.infinitesquareshooter.math.Vector2(500f, 120f)
+		);
+
+		world.getSpawnService().spawnEnemy(
+				com.lobsterchops.infinitesquareshooter.config.types.EnemyType.GHOST_I,
+				new com.lobsterchops.infinitesquareshooter.math.Vector2(500f, 650f)
+		);
+
+		world.getSpawnService().spawnEnemy(
+				com.lobsterchops.infinitesquareshooter.config.types.EnemyType.HOMING_I,
+				new com.lobsterchops.infinitesquareshooter.math.Vector2(920f, 650f)
+		);
+
+		world.getSpawnService().spawnEnemy(
+				com.lobsterchops.infinitesquareshooter.config.types.EnemyType.SPLITTER_I,
+				new com.lobsterchops.infinitesquareshooter.math.Vector2(360f, 120f)
+		);
+
+		world.getSpawnService().spawnEnemy(
+				com.lobsterchops.infinitesquareshooter.config.types.EnemyType.BOMBER_I,
+				new com.lobsterchops.infinitesquareshooter.math.Vector2(650f, 120f)
+		);
+
+		world.getSpawnService().spawnEnemy(
+				com.lobsterchops.infinitesquareshooter.config.types.EnemyType.SWARM_I,
+				new com.lobsterchops.infinitesquareshooter.math.Vector2(360f, 650f)
+		);
 	}
 
 	public InputHandler getInputHandler() {
