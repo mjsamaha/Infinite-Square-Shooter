@@ -4,6 +4,7 @@ import java.awt.Graphics2D;
 
 import com.lobsterchops.infinitesquareshooter.math.Vector2;
 import com.lobsterchops.infinitesquareshooter.model.entity.Player;
+import com.lobsterchops.infinitesquareshooter.render.RenderLayer;
 
 public abstract class Pickup extends Entity implements Collectible {
 
@@ -32,6 +33,11 @@ public abstract class Pickup extends Entity implements Collectible {
 		collected = true;
 		applyEffect(player, world);
 		markInactive();
+	}
+	
+	@Override
+	public RenderLayer getRenderLayer() {
+		return RenderLayer.PICKUPS;
 	}
 
 	@Override

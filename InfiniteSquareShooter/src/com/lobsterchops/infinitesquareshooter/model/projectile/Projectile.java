@@ -7,6 +7,7 @@ import com.lobsterchops.infinitesquareshooter.config.ColorConfig;
 import com.lobsterchops.infinitesquareshooter.math.Vector2;
 import com.lobsterchops.infinitesquareshooter.model.Entity;
 import com.lobsterchops.infinitesquareshooter.model.UpdateContext;
+import com.lobsterchops.infinitesquareshooter.render.RenderLayer;
 
 public class Projectile extends Entity {
 
@@ -41,6 +42,11 @@ public class Projectile extends Entity {
 		g2.setColor(color);
 		g2.fillOval(Math.round(getBounds().x()), Math.round(getBounds().y()), Math.round(getBounds().width()),
 				Math.round(getBounds().height()));
+	}
+	
+	@Override
+	public RenderLayer getRenderLayer() {
+		return RenderLayer.PROJECTILES;
 	}
 
 	public int getDamage() {
