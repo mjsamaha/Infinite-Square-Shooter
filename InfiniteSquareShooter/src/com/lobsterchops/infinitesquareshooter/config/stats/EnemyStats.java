@@ -5,30 +5,6 @@ import com.lobsterchops.infinitesquareshooter.config.types.BehaviourFlag;
 import java.util.EnumSet;
 import java.util.Set;
 
-/**
- * Immutable configuration snapshot for a single enemy variant.
- *
- * <p>Every enemy in the game is fully described by one instance of this record.
- * Fields that do not apply to a given variant should be set to their sentinel value
- * ({@code 0} for numerics, {@code null} for {@code projectile}). Game logic must
- * always check the relevant {@link com.lobsterchops.infinitesquareshooter.config.types.BehaviourFlag}
- * before reading mechanic-specific fields such as {@code splitCount} or {@code invisibilityMs}.</p>
- *
- * <p>Use {@link Builder} to construct instances; it provides defaults for every optional
- * field so only the fields that matter for a given enemy need to be specified.</p>
- *
- * @param speed          Base movement speed in pixels per frame.
- * @param maxHp          Hit points the enemy starts with before dying.
- * @param behaviours     Set of {@link com.lobsterchops.infinitesquareshooter.config.types.BehaviourFlag}
- *                       values that govern this enemy's AI decisions.
- * @param projectile     Projectile configuration used when this enemy shoots;
- *                       {@code null} if the enemy does not shoot.
- * @param splitCount     Number of child enemies spawned on death; {@code 0} if this enemy does not split.
- * @param invisibilityMs Duration in milliseconds of each invisibility phase; {@code 0} if not a Ghost variant.
- * @param dashCooldownMs Milliseconds between consecutive dashes; {@code 0} if the enemy cannot dash.
- * @param swarmGroupSize Base number of enemies in a swarm spawn group; {@code 0} if not a Swarm variant.
- * @param scoreValue     Points awarded to the player for destroying this enemy.
- */
 public record EnemyStats(float speed, int maxHp, Set<BehaviourFlag> behaviours, ProjectileStats projectile,
 		int splitCount, long invisibilityMs, long dashCooldownMs, int swarmGroupSize, int scoreValue) {
 

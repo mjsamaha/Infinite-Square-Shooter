@@ -1,20 +1,5 @@
 package com.lobsterchops.infinitesquareshooter.config.stats;
 
-/**
- * Immutable configuration for the player character.
- *
- * <p>This record represents the player's base stats as they stand at any given moment.
- * Power-ups must not mutate an existing instance; instead, use the {@code with}-style
- * factory helpers defined on this record to produce a modified copy, leaving the
- * original intact. The {@link com.lobsterchops.infinitesquareshooter.config.registry.ConfigRegistry}
- * holds the canonical starting values that apply at the beginning of each run.</p>
- *
- * @param startingLives   Number of lives the player begins with.
- * @param moveSpeed       Base movement speed in pixels per frame.
- * @param invincibilityMs Duration in milliseconds of the invincibility window granted after taking a hit.
- * @param projectile      Default {@link ProjectileStats} configuration for the player's weapon.
- * @param maxLives        Hard upper limit on lives; power-ups cannot push the count above this value.
- */
 public record PlayerStats(int startingLives, float moveSpeed, long invincibilityMs, ProjectileStats projectile,
 		int maxLives) {
 

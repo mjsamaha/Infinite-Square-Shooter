@@ -7,23 +7,6 @@ import com.lobsterchops.infinitesquareshooter.config.stats.BossPhase;
 import com.lobsterchops.infinitesquareshooter.config.stats.BossStats;
 import com.lobsterchops.infinitesquareshooter.config.stats.ProjectileStats;
 
-/**
- * Enumeration of every boss encounter in the game.
- *
- * <p>Each constant is the single source of truth for its boss, holding a fully
- * populated {@link BossStats} instance that includes all phases, mechanic-specific
- * timings, and score values. To add a new boss, declare one constant here with its
- * stats — no other config file needs to change.</p>
- *
- * <p>Constants are declared in encounter order:</p>
- * <ol>
- *   <li>{@link #SWARM_QUEEN} — Act 1 finale</li>
- *   <li>{@link #FORTRESS}    — Act 2 finale</li>
- *   <li>{@link #SPLITTER_KING} — Act 3 finale</li>
- *   <li>{@link #PHANTOM}    — Final Act, second-to-last</li>
- *   <li>{@link #MIMIC}      — Final boss</li>
- * </ol>
- */
 public enum BossType {
 
 	SWARM_QUEEN(

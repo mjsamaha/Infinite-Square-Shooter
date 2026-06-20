@@ -3,6 +3,9 @@ package com.lobsterchops.infinitesquareshooter.config;
 import java.awt.Color;
 
 public final class ColorConfig {
+	
+	// At the moment, all objects will be drawn with colors
+	// Later on I will add pixel art made with Aseprite
 
 	// Base
 	public static final Color BLACK = new Color(0, 0, 0);

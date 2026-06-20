@@ -1,12 +1,5 @@
 package com.lobsterchops.infinitesquareshooter.config;
 
-/**
- * Global constants that don't belong to any specific game entity.
- *
- * Simple primitives like these don't need records or enums — a final class with
- * static constants is the right tool. Only move values here if they are truly
- * global and not entity-specific.
- */
 public final class GameConfig {
 
 	public static final int TARGET_FPS = 60;

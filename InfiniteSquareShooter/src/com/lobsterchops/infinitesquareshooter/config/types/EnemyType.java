@@ -3,19 +3,6 @@ package com.lobsterchops.infinitesquareshooter.config.types;
 import com.lobsterchops.infinitesquareshooter.config.stats.EnemyStats;
 import com.lobsterchops.infinitesquareshooter.config.stats.ProjectileStats;
 
-/**
- * Enumeration of every enemy variant in the game.
- *
- * <p>Each constant is the single source of truth for that variant's {@link EnemyStats}.
- * To add a new enemy variant, declare one constant here with its stats — no other
- * config file needs to change. The {@link com.lobsterchops.infinitesquareshooter.config.registry.ConfigRegistry}
- * automatically picks up all constants at class-load time.</p>
- *
- * <p>Constants follow the naming convention {@code TYPE_ROMANNUMERAL}, for example
- * {@code TANK_II} or {@code SHOOTER_III}. Roman numerals I–III correspond to the
- * three acts of wave progression, with higher numerals representing faster and more
- * dangerous variants of the same archetype.</p>
- */
 public enum EnemyType {
 
 	BASIC_I(EnemyStats.builder().speed(1.5f).maxHp(2).behaviour(BehaviourFlag.MOVES_STRAIGHT).scoreValue(50).build()),

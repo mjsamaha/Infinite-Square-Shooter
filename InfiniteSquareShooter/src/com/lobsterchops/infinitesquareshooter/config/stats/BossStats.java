@@ -2,30 +2,6 @@ package com.lobsterchops.infinitesquareshooter.config.stats;
 
 import java.util.List;
 
-/**
- * Immutable configuration for a boss encounter.
- *
- * <p>A boss is defined as an ordered list of {@link BossPhase} objects. Single-phase bosses
- * (e.g. The Phantom) provide a list of exactly one phase. Multi-phase bosses (e.g. The Splitter King)
- * transition through phases as HP thresholds are crossed.</p>
- *
- * <p>Fields that are not relevant to a particular boss should be set to {@code 0}. Game logic
- * must check the boss's {@link com.lobsterchops.infinitesquareshooter.config.types.BehaviourFlag}
- * set before reading mechanic-specific fields such as {@code turretCount} or {@code shellOpenMs}.</p>
- *
- * @param baseSpeed       Base movement speed in pixels per frame, before any per-phase multiplier is applied.
- * @param phases          Ordered list of phases; index {@code 0} is always the opening phase.
- * @param scoreValue      Points awarded to the player upon defeating this boss.
- * @param shellOpenMs     Swarm Queen only — duration in milliseconds that the shell remains open per cycle;
- *                        {@code 0} for all other bosses.
- * @param shellIntervalMs Swarm Queen only — milliseconds between consecutive shell openings;
- *                        {@code 0} for all other bosses.
- * @param turretCount     Fortress only — number of turrets that must be destroyed before the core
- *                        becomes vulnerable; {@code 0} for all other bosses.
- * @param turretHp        Fortress only — hit points per individual turret; {@code 0} for all other bosses.
- * @param spawnIntervalMs Swarm Queen only — milliseconds between each minion spawn wave;
- *                        {@code 0} for all other bosses.
- */
 public record BossStats(float baseSpeed, List<BossPhase> phases, int scoreValue, long shellOpenMs, long shellIntervalMs,
 		int turretCount, int turretHp, long spawnIntervalMs) {
 
