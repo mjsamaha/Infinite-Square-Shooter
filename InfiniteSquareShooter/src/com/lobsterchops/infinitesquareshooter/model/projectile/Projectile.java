@@ -1,11 +1,9 @@
 package com.lobsterchops.infinitesquareshooter.model.projectile;
 
-import java.awt.Color;
 import java.awt.Graphics2D;
 
 import com.lobsterchops.infinitesquareshooter.combat.DamageSource;
 import com.lobsterchops.infinitesquareshooter.combat.Team;
-import com.lobsterchops.infinitesquareshooter.config.ColorConfig;
 import com.lobsterchops.infinitesquareshooter.math.Vector2;
 import com.lobsterchops.infinitesquareshooter.model.Damageable;
 import com.lobsterchops.infinitesquareshooter.model.Entity;

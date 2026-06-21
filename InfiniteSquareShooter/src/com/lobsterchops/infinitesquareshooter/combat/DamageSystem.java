@@ -1,7 +1,6 @@
 package com.lobsterchops.infinitesquareshooter.combat;
 
 import com.lobsterchops.infinitesquareshooter.model.Damageable;
-import com.lobsterchops.infinitesquareshooter.model.GameObject;
 import com.lobsterchops.infinitesquareshooter.model.UpdateContext;
 
 public class DamageSystem {

@@ -5,7 +5,6 @@ import java.util.List;
 
 import com.lobsterchops.infinitesquareshooter.config.stats.ProjectileStats;
 import com.lobsterchops.infinitesquareshooter.math.Vector2;
-import com.lobsterchops.infinitesquareshooter.model.projectile.BombProjectile;
 
 public class ProjectileFactory {
 
