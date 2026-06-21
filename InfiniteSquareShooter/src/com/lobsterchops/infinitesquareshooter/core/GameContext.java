@@ -2,6 +2,7 @@ package com.lobsterchops.infinitesquareshooter.core;
 
 import com.lobsterchops.infinitesquareshooter.config.ScreenConfig;
 import com.lobsterchops.infinitesquareshooter.input.InputHandler;
+import com.lobsterchops.infinitesquareshooter.input.InputManager;
 import com.lobsterchops.infinitesquareshooter.manager.GameUpdater;
 import com.lobsterchops.infinitesquareshooter.math.Vector2;
 import com.lobsterchops.infinitesquareshooter.model.GameWorld;
@@ -11,7 +12,7 @@ import com.lobsterchops.infinitesquareshooter.render.RenderPipeline;
 
 public class GameContext {
 
-	private final InputHandler inputHandler;
+	private final InputManager inputManager;
 	private final GameWorld world;
 	private final GameUpdater updater;
 	
@@ -19,16 +20,16 @@ public class GameContext {
 	private final RenderPipeline renderPipeline;
 
 	public GameContext() {
-		this.inputHandler = new InputHandler();
+		this.inputManager = new InputManager();
 		this.world = new GameWorld();
 		this.debugMetrics = new DebugMetrics();
 		this.renderPipeline = new RenderPipeline(world, debugMetrics);
-		this.updater = new GameUpdater(world, inputHandler, renderPipeline, this::restartRun);
+		this.updater = new GameUpdater(world, inputManager, renderPipeline, this::restartRun);
 	}
 	
 	public void setupNewRun() {
 		Vector2 startPosition = new Vector2(ScreenConfig.WIDTH / 2f, ScreenConfig.HEIGHT / 2f);
-		Player player = new Player(startPosition, inputHandler);
+		Player player = new Player(startPosition, inputManager);
 		world.setPlayer(player);
 	}
 
@@ -36,10 +37,16 @@ public class GameContext {
 		world.clear();
 		setupNewRun();
 	}
+	
+	public void registerInput(GamePanel panel) {
 
-	public InputHandler getInputHandler() {
-		return inputHandler;
+	    inputManager.register(panel);
 	}
+
+	public InputManager getInputManager() {
+
+        return inputManager;
+    }
 
 	public GameWorld getWorld() {
 		return world;

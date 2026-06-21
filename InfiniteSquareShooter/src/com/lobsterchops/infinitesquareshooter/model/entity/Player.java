@@ -9,6 +9,7 @@ import com.lobsterchops.infinitesquareshooter.config.ConfigRegistry;
 import com.lobsterchops.infinitesquareshooter.config.ScreenConfig;
 import com.lobsterchops.infinitesquareshooter.config.stats.PlayerStats;
 import com.lobsterchops.infinitesquareshooter.input.InputHandler;
+import com.lobsterchops.infinitesquareshooter.input.InputManager;
 import com.lobsterchops.infinitesquareshooter.math.Vector2;
 import com.lobsterchops.infinitesquareshooter.model.Damageable;
 import com.lobsterchops.infinitesquareshooter.model.Entity;
@@ -19,14 +20,15 @@ import com.lobsterchops.infinitesquareshooter.state.GameState;
 public class Player extends Entity implements Damageable, TeamMember {
 
 	private PlayerStats stats;
-	private final InputHandler input;
+	//private final InputHandler input;
+	private InputManager input;
 
 	private int lives;
 	private long lastShotTime;
 	private long invincibleUntil;
 	private boolean invincible;
 
-	public Player(Vector2 position, InputHandler input) {
+	public Player(Vector2 position, InputManager input) {
 		super(position, 32f, 32f);
 		this.stats = ConfigRegistry.player();
 		this.input = input;

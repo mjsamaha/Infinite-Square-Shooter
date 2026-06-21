@@ -22,15 +22,18 @@ public class GamePanel extends JPanel implements Runnable {
 		initializePanel();
 
 		this.context = new GameContext();
+		
+		context.registerInput(this);
 
 		this.gameLoop = new GameLoop(
 				context.getUpdater()::update,
 				this::repaint,
 				context.getDebugMetrics()
 		);
+		
+		//context.getInputManager().register(this);
 
-		this.addKeyListener(context.getInputHandler());
-		this.addMouseMotionListener(context.getInputHandler());
+	
 	}
 
 	private void initializePanel() {
