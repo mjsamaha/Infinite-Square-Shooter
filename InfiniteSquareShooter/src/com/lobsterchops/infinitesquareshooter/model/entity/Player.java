@@ -19,7 +19,6 @@ import com.lobsterchops.infinitesquareshooter.state.GameState;
 public class Player extends Entity implements Damageable, TeamMember {
 
 	private PlayerStats stats;
-	//private final InputHandler input;
 	private InputManager input;
 
 	private int lives;
