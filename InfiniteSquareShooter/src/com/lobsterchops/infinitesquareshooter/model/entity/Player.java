@@ -8,7 +8,6 @@ import com.lobsterchops.infinitesquareshooter.config.ColorConfig;
 import com.lobsterchops.infinitesquareshooter.config.ConfigRegistry;
 import com.lobsterchops.infinitesquareshooter.config.ScreenConfig;
 import com.lobsterchops.infinitesquareshooter.config.stats.PlayerStats;
-import com.lobsterchops.infinitesquareshooter.input.InputHandler;
 import com.lobsterchops.infinitesquareshooter.input.InputManager;
 import com.lobsterchops.infinitesquareshooter.math.Vector2;
 import com.lobsterchops.infinitesquareshooter.model.Damageable;

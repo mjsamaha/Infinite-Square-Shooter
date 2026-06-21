@@ -1,7 +1,6 @@
 package com.lobsterchops.infinitesquareshooter.core;
 
 import com.lobsterchops.infinitesquareshooter.config.ScreenConfig;
-import com.lobsterchops.infinitesquareshooter.input.InputHandler;
 import com.lobsterchops.infinitesquareshooter.input.InputManager;
 import com.lobsterchops.infinitesquareshooter.manager.GameUpdater;
 import com.lobsterchops.infinitesquareshooter.math.Vector2;
