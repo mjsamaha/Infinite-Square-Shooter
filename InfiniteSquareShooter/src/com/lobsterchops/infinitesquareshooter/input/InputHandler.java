@@ -15,8 +15,10 @@ public class InputHandler implements KeyListener, MouseMotionListener {
 	private boolean rightPressed;
 	private boolean pausePressed;
 	private boolean restartPressed;
-	
+
 	private boolean debugToggleRequested;
+	private boolean pauseToggleRequested;
+	private boolean restartRequested;
 
 	private Vector2 mousePosition = Vector2.ZERO;
 
@@ -28,8 +30,17 @@ public class InputHandler implements KeyListener, MouseMotionListener {
 		if (code == KeyEvent.VK_S) downPressed = true;
 		if (code == KeyEvent.VK_A) leftPressed = true;
 		if (code == KeyEvent.VK_D) rightPressed = true;
+
+		if (code == KeyEvent.VK_ESCAPE && !pausePressed) {
+			pauseToggleRequested = true;
+		}
 		if (code == KeyEvent.VK_ESCAPE) pausePressed = true;
+
+		if (code == KeyEvent.VK_R && !restartPressed) {
+			restartRequested = true;
+		}
 		if (code == KeyEvent.VK_R) restartPressed = true;
+
 		if (code == KeyEvent.VK_F3) debugToggleRequested = true;
 	}
 
@@ -77,6 +88,24 @@ public class InputHandler implements KeyListener, MouseMotionListener {
 		}
 
 		debugToggleRequested = false;
+		return true;
+	}
+
+	public boolean consumePauseToggleRequest() {
+		if (!pauseToggleRequested) {
+			return false;
+		}
+
+		pauseToggleRequested = false;
+		return true;
+	}
+
+	public boolean consumeRestartRequest() {
+		if (!restartRequested) {
+			return false;
+		}
+
+		restartRequested = false;
 		return true;
 	}
 

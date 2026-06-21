@@ -9,10 +9,12 @@ import com.lobsterchops.infinitesquareshooter.combat.DamageSystem;
 import com.lobsterchops.infinitesquareshooter.config.GameConfig;
 import com.lobsterchops.infinitesquareshooter.config.types.EnemyType;
 import com.lobsterchops.infinitesquareshooter.math.Vector2;
+import com.lobsterchops.infinitesquareshooter.model.entity.Enemy;
 import com.lobsterchops.infinitesquareshooter.model.entity.Player;
+import com.lobsterchops.infinitesquareshooter.score.RunStats;
+import com.lobsterchops.infinitesquareshooter.score.ScoreManager;
 import com.lobsterchops.infinitesquareshooter.state.GameState;
 import com.lobsterchops.infinitesquareshooter.system.EnemyDeathSystem;
-import com.lobsterchops.infinitesquareshooter.model.entity.Enemy;
 import com.lobsterchops.infinitesquareshooter.wave.WaveManager;
 
 public class GameWorld {
@@ -24,11 +26,12 @@ public class GameWorld {
 	private final EnemyDeathSystem enemyDeathSystem = new EnemyDeathSystem();
 	
 	private final WaveManager waveManager = new WaveManager(this);
+	private final ScoreManager scoreManager = new ScoreManager();
+	private final RunStats runStats = new RunStats();
 
 	private Player player;
 	private GameState state = GameState.PLAYING;
 	private int waveNumber = 1;
-	private int score = 0;
 	
 	private long tick;
 	private long elapsedMillis;
@@ -40,6 +43,9 @@ public class GameWorld {
 
 		tick++;
 		elapsedMillis += Math.round(1000f / GameConfig.TARGET_FPS);
+		
+		runStats.sync(this);
+		scoreManager.tick(elapsedMillis);
 
 		UpdateContext context = UpdateContext.fixed(this, tick, elapsedMillis);
 
@@ -114,11 +120,12 @@ public class GameWorld {
 		objects.clear();
 		pendingObjects.clear();
 		player = null;
-		score = 0;
 		waveNumber = 1;
 		tick = 0;
 		elapsedMillis = 0;
 		state = GameState.PLAYING;
+		scoreManager.reset();
+		runStats.reset();
 		waveManager.reset(elapsedMillis);
 	}
 	
@@ -148,11 +155,19 @@ public class GameWorld {
 	}
 
 	public int getScore() {
-		return score;
+		return scoreManager.getScore();
 	}
 
 	public void addScore(int amount) {
-		score += Math.max(0, amount);
+		scoreManager.addBonus(amount);
+	}
+
+	public ScoreManager getScoreManager() {
+		return scoreManager;
+	}
+
+	public RunStats getRunStats() {
+		return runStats;
 	}
 
 	private void flushPendingObjects() {

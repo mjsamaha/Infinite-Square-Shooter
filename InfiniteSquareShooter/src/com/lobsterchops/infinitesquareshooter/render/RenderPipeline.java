@@ -4,12 +4,15 @@ import java.awt.Graphics2D;
 
 import com.lobsterchops.infinitesquareshooter.model.GameWorld;
 import com.lobsterchops.infinitesquareshooter.model.Renderable;
+import com.lobsterchops.infinitesquareshooter.state.GameState;
 
 public class RenderPipeline {
 
 	private final BackgroundRenderer backgroundRenderer = new BackgroundRenderer();
 	private final HudRenderer hudRenderer = new HudRenderer();
 	private final DebugRenderer debugRenderer = new DebugRenderer();
+	private final PauseOverlay pauseOverlay = new PauseOverlay();
+	private final GameOverOverlay gameOverOverlay = new GameOverOverlay();
 
 	private final GameWorld world;
 	private final DebugMetrics debugMetrics;
@@ -30,6 +33,12 @@ public class RenderPipeline {
 		renderLayer(g2, RenderLayer.EFFECTS);
 
 		hudRenderer.render(g2, world);
+
+		if (world.getState() == GameState.PAUSED) {
+			pauseOverlay.render(g2);
+		} else if (world.getState() == GameState.GAME_OVER) {
+			gameOverOverlay.render(g2, world);
+		}
 
 		if (debugEnabled) {
 			debugRenderer.render(g2, world, debugMetrics);

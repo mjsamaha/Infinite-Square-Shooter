@@ -89,6 +89,8 @@ public class WaveManager {
 	
 
 	private void updateComplete(long nowMs) {
+		world.getScoreManager().addWaveBonus(world.getWaveNumber());
+
 		world.setWaveNumber(world.getWaveNumber() + 1);
 		currentWave = null;
 		pendingBoss = null;

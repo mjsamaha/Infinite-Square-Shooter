@@ -23,15 +23,18 @@ public class GameContext {
 		this.world = new GameWorld();
 		this.debugMetrics = new DebugMetrics();
 		this.renderPipeline = new RenderPipeline(world, debugMetrics);
-		this.updater = new GameUpdater(world, inputHandler, renderPipeline);
+		this.updater = new GameUpdater(world, inputHandler, renderPipeline, this::restartRun);
 	}
-
+	
 	public void setupNewRun() {
 		Vector2 startPosition = new Vector2(ScreenConfig.WIDTH / 2f, ScreenConfig.HEIGHT / 2f);
 		Player player = new Player(startPosition, inputHandler);
 		world.setPlayer(player);
-		
-		
+	}
+
+	public void restartRun() {
+		world.clear();
+		setupNewRun();
 	}
 
 	public InputHandler getInputHandler() {
@@ -45,7 +48,7 @@ public class GameContext {
 	public GameUpdater getUpdater() {
 		return updater;
 	}
-	
+
 	public RenderPipeline getRenderPipeline() {
 		return renderPipeline;
 	}

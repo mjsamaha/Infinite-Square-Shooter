@@ -69,6 +69,7 @@ public class Player extends Entity implements Damageable, TeamMember {
 		}
 
 		context.spawnService().spawnPlayerProjectile(getPosition(), direction, stats.projectile());
+		context.world().getRunStats().recordShotFired();
 		lastShotTime = now;
 	}
 

@@ -32,7 +32,8 @@ public class EnemyDeathSystem {
 	}
 
 	private void handleEnemyDeath(Enemy enemy, UpdateContext context) {
-		context.world().addScore(enemy.getScoreValue());
+		context.world().getScoreManager().addKillScore(enemy.getScoreValue(), context.elapsedMillis());
+		context.world().getRunStats().recordKill();
 
 		spawnSplitChildren(enemy, context);
 		spawnExplosion(enemy, context);
