@@ -7,6 +7,8 @@ import com.lobsterchops.infinitesquareshooter.model.UpdateContext;
 import com.lobsterchops.infinitesquareshooter.model.entity.Enemy;
 
 public class EnemySplitSystem {
+	
+	private static final float SPLIT_OFFSET_RADIUS = 18f;
 
 	public void update(Enemy enemy, UpdateContext context) {
 		if (!enemy.isDead()) {
@@ -22,8 +24,8 @@ public class EnemySplitSystem {
 		for (int index = 0; index < splitCount; index++) {
 			float angle = (float) ((Math.PI * 2) / splitCount * index);
 			Vector2 offset = new Vector2(
-					(float) Math.cos(angle) * 18f,
-					(float) Math.sin(angle) * 18f
+					(float) Math.cos(angle) * SPLIT_OFFSET_RADIUS,
+					(float) Math.sin(angle) * SPLIT_OFFSET_RADIUS
 			);
 
 			context.spawnService().spawnEnemy(resolveChildType(enemy.getType()), enemy.getPosition().add(offset));

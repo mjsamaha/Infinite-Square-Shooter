@@ -9,6 +9,7 @@ import com.lobsterchops.infinitesquareshooter.model.entity.Player;
 public class EnemyDashSystem {
 
 	private static final long DASH_DURATION_MS = 220L;
+	private static final float DASH_SPEED_MULTIPLIER = 3.4f;
 
 	public void update(Enemy enemy, UpdateContext context) {
 		if (!enemy.hasBehaviour(BehaviourFlag.CAN_DASH)) {
@@ -36,7 +37,7 @@ public class EnemyDashSystem {
 
 		Vector2 dashDirection = enemy.getPosition().directionTo(player.getPosition());
 
-		enemy.setVelocity(dashDirection.multiply(enemy.getStats().speed() * 3.4f));
+		enemy.setVelocity(dashDirection.multiply(enemy.getStats().speed() * DASH_SPEED_MULTIPLIER));
 		enemy.setDashing(true);
 		enemy.setDashStartedAt(now);
 		enemy.setLastDashTime(now);

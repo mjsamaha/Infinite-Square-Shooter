@@ -1,0 +1,34 @@
+audio needed for game
+
+Music
+
+- splash screen music
+- main menu music
+- gameplay music
+
+
+
+Sfx:
+- ui clicking
+- ui transitions (screen)
+- pause menu open/close
+
+- player shoot
+- player hit
+
+- enemy shoot
+- enemy hit
+- enemy death
+- enemy split
+- enemy spawn
+- enemy dash
+
+- boss spawn
+- boss phase change
+- boss death
+
+- combo tick
+
+- wave start
+- wave end
+- game over

@@ -16,6 +16,8 @@ public final class ColorConfig {
 	public static final Color HUD_TEXT = WHITE;
 	public static final Color HUD_BACKGROUND = new Color(0, 0, 0, 180); // semi-transparent
 	public static final Color SCORE_COLOUR = new Color(255, 220, 50); // gold
+	
+	public static final Color OVERLAY_COLOR = new Color(0, 0, 0, 160); 
 
 	// Player
 	public static final Color PLAYER = new Color(80, 160, 255); // blue
