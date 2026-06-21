@@ -27,16 +27,16 @@ public class Enemy extends Entity implements Damageable, TeamMember, ScoreValue 
 	private long lastDashTime;
 	private long invisibilityStartedAt;
 	private boolean invisible;
-	
+
 	private boolean deathHandled;
-	
+
 	private long dashStartedAt;
 	private boolean dashing;
 	private float orbitRadius;
 	private long lastBombTime;
 
 	public Enemy(EnemyType type, EnemyStats stats, Vector2 position, EnemyBehaviorSystem behaviorSystem) {
-		super(position, EnemySizeResolver.sizeFor(type), EnemySizeResolver.sizeFor(type));		
+		super(position, EnemySizeResolver.sizeFor(type), EnemySizeResolver.sizeFor(type));
 		this.type = type;
 		this.stats = stats;
 		this.behaviorSystem = behaviorSystem;
@@ -57,12 +57,8 @@ public class Enemy extends Entity implements Damageable, TeamMember, ScoreValue 
 		}
 
 		g2.setColor(resolveColor());
-		g2.fillRect(
-				Math.round(getBounds().x()),
-				Math.round(getBounds().y()),
-				Math.round(getBounds().width()),
-				Math.round(getBounds().height())
-		);
+		g2.fillRect(Math.round(getBounds().x()), Math.round(getBounds().y()), Math.round(getBounds().width()),
+				Math.round(getBounds().height()));
 	}
 
 	@Override
@@ -111,22 +107,34 @@ public class Enemy extends Entity implements Damageable, TeamMember, ScoreValue 
 	private java.awt.Color resolveColor() {
 		String name = type.name();
 
-		if (name.startsWith("BASIC")) return ColorConfig.ENEMY_BASIC;
-		if (name.startsWith("ZIGZAG")) return ColorConfig.ENEMY_ZIGZAG;
-		if (name.startsWith("SHOOTER")) return ColorConfig.ENEMY_SHOOTER;
-		if (name.startsWith("DASHER")) return ColorConfig.ENEMY_DASHER;
-		if (name.startsWith("SPREAD")) return ColorConfig.ENEMY_SPREAD;
-		if (name.startsWith("TANK")) return ColorConfig.ENEMY_TANK;
-		if (name.startsWith("SPLITTER")) return ColorConfig.ENEMY_SPLITTER;
-		if (name.startsWith("ORBITER")) return ColorConfig.ENEMY_ORBITER;
-		if (name.startsWith("BOMBER")) return ColorConfig.ENEMY_BOMBER;
-		if (name.startsWith("GHOST")) return ColorConfig.ENEMY_GHOST;
-		if (name.startsWith("HOMING")) return ColorConfig.ENEMY_HOMING;
-		if (name.startsWith("SWARM")) return ColorConfig.ENEMY_SWARM;
+		if (name.startsWith("BASIC"))
+			return ColorConfig.ENEMY_BASIC;
+		if (name.startsWith("ZIGZAG"))
+			return ColorConfig.ENEMY_ZIGZAG;
+		if (name.startsWith("SHOOTER"))
+			return ColorConfig.ENEMY_SHOOTER;
+		if (name.startsWith("DASHER"))
+			return ColorConfig.ENEMY_DASHER;
+		if (name.startsWith("SPREAD"))
+			return ColorConfig.ENEMY_SPREAD;
+		if (name.startsWith("TANK"))
+			return ColorConfig.ENEMY_TANK;
+		if (name.startsWith("SPLITTER"))
+			return ColorConfig.ENEMY_SPLITTER;
+		if (name.startsWith("ORBITER"))
+			return ColorConfig.ENEMY_ORBITER;
+		if (name.startsWith("BOMBER"))
+			return ColorConfig.ENEMY_BOMBER;
+		if (name.startsWith("GHOST"))
+			return ColorConfig.ENEMY_GHOST;
+		if (name.startsWith("HOMING"))
+			return ColorConfig.ENEMY_HOMING;
+		if (name.startsWith("SWARM"))
+			return ColorConfig.ENEMY_SWARM;
 
 		return ColorConfig.WHITE;
 	}
-	
+
 	public boolean isDeathHandled() {
 		return deathHandled;
 	}
@@ -182,7 +190,7 @@ public class Enemy extends Entity implements Damageable, TeamMember, ScoreValue 
 	public void setInvisible(boolean invisible) {
 		this.invisible = invisible;
 	}
-	
+
 	public long getDashStartedAt() {
 		return dashStartedAt;
 	}

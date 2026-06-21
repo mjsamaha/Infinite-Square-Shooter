@@ -27,7 +27,7 @@ public class GameContext {
 	}
 	
 	public void setupNewRun() {
-		Vector2 startPosition = new Vector2(ScreenConfig.WIDTH / 2f, ScreenConfig.HEIGHT / 2f);
+		Vector2 startPosition = new Vector2(ScreenConfig.WIDTH / ScreenConfig.CENTER_DIVISOR, ScreenConfig.HEIGHT / ScreenConfig.CENTER_DIVISOR);
 		Player player = new Player(startPosition, inputManager);
 		world.setPlayer(player);
 	}

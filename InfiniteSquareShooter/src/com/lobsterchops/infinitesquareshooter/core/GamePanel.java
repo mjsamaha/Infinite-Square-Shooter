@@ -31,7 +31,6 @@ public class GamePanel extends JPanel implements Runnable {
 				context.getDebugMetrics()
 		);
 		
-		//context.getInputManager().register(this);
 
 	
 	}

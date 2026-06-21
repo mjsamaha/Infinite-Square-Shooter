@@ -21,6 +21,7 @@ public class GameWorld {
 
 	private final List<GameObject> objects = new ArrayList<>();
 	private final List<GameObject> pendingObjects = new ArrayList<>();
+	
 	private final SpawnService spawnService = new SpawnService(this);
 	private final CollisionSystem collisionSystem = new CollisionSystem(new DamageSystem());
 	private final EnemyDeathSystem enemyDeathSystem = new EnemyDeathSystem();
@@ -40,36 +41,73 @@ public class GameWorld {
 		if (state != GameState.PLAYING) {
 			return;
 		}
-
-		tick++;
-		elapsedMillis += Math.round(1000f / GameConfig.TARGET_FPS);
 		
+		// Process pending objects before the update to ensure they are included in the current tick.
+		beginUpdate();
+		
+		// Update time and meta-systems before updating objects and systems to ensure they have the latest context.
+		updateTime();
+		updateMetaSystems();
+		
+		// Create a single context object to pass to all updates to ensure consistency across the update cycle.
+		UpdateContext context = createContext();
+		
+		// Update all game objects and systems using the same context to ensure they are synchronized with the current tick and elapsed time.
+		updateObjects(context);
+		updateSystems(context);
+		
+		// Process pending objects again after the update to ensure any new objects created during the update are included in the next tick.
+		endUpdate(context);
+
+
+	}
+	
+	private void beginUpdate() {
+		flushPendingObjects();
+	}
+	
+	private void endUpdate(UpdateContext context) {
+		flushPendingObjects();
+		removeInactiveObjects();
+	}
+	
+	
+	private void updateTime() {
+		tick++;
+		elapsedMillis += Math.round(
+				GameConfig.MILLIS_PER_SECOND / GameConfig.TARGET_FPS
+			);
+	}
+	
+	private void updateMetaSystems() {
 		runStats.sync(this);
 		scoreManager.tick(elapsedMillis);
-
-		UpdateContext context = UpdateContext.fixed(this, tick, elapsedMillis);
-
-		flushPendingObjects();
-
+	}
+	
+	private UpdateContext createContext() {
+		return UpdateContext.fixed(this, tick, elapsedMillis);
+	}
+	
+	private void updateObjects(UpdateContext context) {
 		for (GameObject object : objects) {
 			if (object.isActive()) {
 				object.update(context);
 			}
 		}
-
+	}
+	
+	private void updateSystems(UpdateContext context) {
 		collisionSystem.update(context);
 		enemyDeathSystem.update(context);
-
+		
 		if (player != null) {
 			player.handleDeath(this);
 		}
-
-		flushPendingObjects();
-		removeInactiveObjects();
-
+		
 		waveManager.update(context);
-
 	}
+
+	
 
 	public void addObject(GameObject object) {
 		if (object != null) {

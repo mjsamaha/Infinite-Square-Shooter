@@ -21,6 +21,8 @@ public final class GameConfig {
 
 	/** Multiplier applied to all enemy stats in endless mode per cycle. */
 	public static final float ENDLESS_DIFFICULTY_SCALE = 1.15f;
+	
+	public static final long MILLIS_PER_SECOND = 1000L;
 
 	private GameConfig() {
 

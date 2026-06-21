@@ -2,6 +2,7 @@ package com.lobsterchops.infinitesquareshooter.core;
 
 import com.lobsterchops.infinitesquareshooter.config.GameConfig;
 import com.lobsterchops.infinitesquareshooter.render.DebugMetrics;
+import com.lobsterchops.infinitesquareshooter.utils.FpsCounter;
 
 public class GameLoop {
 
@@ -9,6 +10,7 @@ public class GameLoop {
 	private final Runnable requestRepaint;
 	
 	private final DebugMetrics debugMetrics;
+	private final FpsCounter fpsCounter = new FpsCounter();
 
 	private volatile boolean running = true;
 
@@ -19,31 +21,42 @@ public class GameLoop {
 	}
 
 	public void run() {
-		double delta = 0.0; // accumulates time to determine when to update/render
-		long lastTime = System.nanoTime(); // tracks the last time we updated/rendered
-		long timer = 0L; // accumulates time for FPS calculation
-		int frameCount = 0; // counts frames rendered in the current second
 
-		while (running) {
-			long currentTime = System.nanoTime();
-			long elapsed = currentTime - lastTime;
-			lastTime = currentTime;
+        double delta = 0.0;
+        long lastTime = System.nanoTime();
 
-			delta += elapsed / GameConfig.DRAW_INTERVAL;
-			timer += elapsed;
+        while (running) {
 
-			while (delta >= 1) {
-				updateTick.run();
-				requestRepaint.run();
-				delta--;
-				frameCount++; // count each rendered frame
-			}
+            long currentTime = System.nanoTime();
+            long elapsed = currentTime - lastTime;
+            lastTime = currentTime;
 
-			if (timer >= GameConfig.TIMER_INTERVAL) {
-				debugMetrics.setFps(frameCount); 
-				frameCount = 0;
-				timer = 0L;
-			}
+            delta += calculateDelta(elapsed);
+
+            processUpdates(delta);
+            delta %= 1; // keeps leftover fractional time
+
+            fpsCounter.frame(elapsed);
+
+            updateFpsIfNeeded();
+        }
+    }
+	
+	private double calculateDelta(long elapsedNanos) {
+		return elapsedNanos / GameConfig.DRAW_INTERVAL;
+	}
+	
+	private void processUpdates(double delta) {
+		while (delta >= 1) {
+			updateTick.run();
+			requestRepaint.run();
+			delta--;
+		}
+	}
+	
+	private void updateFpsIfNeeded() {
+		if (fpsCounter.shouldUpdate()) {
+			debugMetrics.setFps(fpsCounter.consumeFps());
 		}
 	}
 
