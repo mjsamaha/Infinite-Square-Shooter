@@ -1,5 +1,8 @@
 package com.lobsterchops.infinitesquareshooter.core;
 
+import com.lobsterchops.infinitesquareshooter.audio.AudioService;
+import com.lobsterchops.infinitesquareshooter.audio.JavaSoundAudioService;
+import com.lobsterchops.infinitesquareshooter.audio.SoundType;
 import com.lobsterchops.infinitesquareshooter.config.ScreenConfig;
 import com.lobsterchops.infinitesquareshooter.input.InputManager;
 import com.lobsterchops.infinitesquareshooter.manager.GameUpdater;
@@ -11,55 +14,47 @@ import com.lobsterchops.infinitesquareshooter.render.RenderPipeline;
 
 public class GameContext {
 
-	private final InputManager inputManager;
-	private final GameWorld world;
-	private final GameUpdater updater;
-	
-	private final DebugMetrics debugMetrics;
-	private final RenderPipeline renderPipeline;
+    public GameContext() {
+        // 1. No-dependency services first
+        InputManager inputManager = new InputManager();
+        GameWorld world           = new GameWorld();
+        DebugMetrics debugMetrics = new DebugMetrics();
 
-	public GameContext() {
-		this.inputManager = new InputManager();
-		this.world = new GameWorld();
-		this.debugMetrics = new DebugMetrics();
-		this.renderPipeline = new RenderPipeline(world, debugMetrics);
-		this.updater = new GameUpdater(world, inputManager, renderPipeline, this::restartRun);
-	}
-	
-	public void setupNewRun() {
-		Vector2 startPosition = new Vector2(ScreenConfig.WIDTH / ScreenConfig.CENTER_DIVISOR, ScreenConfig.HEIGHT / ScreenConfig.CENTER_DIVISOR);
-		Player player = new Player(startPosition, inputManager);
-		world.setPlayer(player);
-	}
+        // 2. Services that depend on the above
+        RenderPipeline renderPipeline = new RenderPipeline(world, debugMetrics);
 
-	public void restartRun() {
-		world.clear();
-		setupNewRun();
-	}
-	
-	public void registerInput(GamePanel panel) {
+        AudioService audioService = new JavaSoundAudioService();
+        audioService.init();
 
-	    inputManager.register(panel);
-	}
+        // 3. Updater wires everything together
+        GameUpdater updater = new GameUpdater(
+            world, inputManager, renderPipeline, audioService, this::restartRun
+        );
 
-	public InputManager getInputManager() {
-
-        return inputManager;
+        // 4. Register — order doesn't matter here, all constructed already
+        ServiceLocator.register(InputManager.class,  inputManager);
+        ServiceLocator.register(GameWorld.class,     world);
+        ServiceLocator.register(DebugMetrics.class,  debugMetrics);
+        ServiceLocator.register(RenderPipeline.class, renderPipeline);
+        ServiceLocator.register(AudioService.class,  audioService);
+        ServiceLocator.register(GameUpdater.class,   updater);
     }
 
-	public GameWorld getWorld() {
-		return world;
-	}
+    public void setupNewRun() {
+        InputManager inputManager = ServiceLocator.resolve(InputManager.class);
+        GameWorld world           = ServiceLocator.resolve(GameWorld.class);
+        AudioService audioService = ServiceLocator.resolve(AudioService.class);
 
-	public GameUpdater getUpdater() {
-		return updater;
-	}
+        Vector2 startPosition = new Vector2(
+            ScreenConfig.WIDTH  / ScreenConfig.CENTER_DIVISOR,
+            ScreenConfig.HEIGHT / ScreenConfig.CENTER_DIVISOR
+        );
+        world.setPlayer(new Player(startPosition, inputManager));
+        audioService.playMusic(SoundType.MUSIC_GAMEPLAY);
+    }
 
-	public RenderPipeline getRenderPipeline() {
-		return renderPipeline;
-	}
-
-	public DebugMetrics getDebugMetrics() {
-		return debugMetrics;
-	}
+    public void restartRun() {
+        ServiceLocator.resolve(GameWorld.class).clear();
+        setupNewRun();
+    }
 }

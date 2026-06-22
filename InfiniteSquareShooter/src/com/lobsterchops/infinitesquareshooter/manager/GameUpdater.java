@@ -1,5 +1,6 @@
 package com.lobsterchops.infinitesquareshooter.manager;
 
+import com.lobsterchops.infinitesquareshooter.audio.AudioService;
 import com.lobsterchops.infinitesquareshooter.input.Command;
 import com.lobsterchops.infinitesquareshooter.input.InputManager;
 import com.lobsterchops.infinitesquareshooter.model.GameWorld;
@@ -11,25 +12,27 @@ public class GameUpdater {
     private final GameWorld world;
     private final InputManager input;
     private final RenderPipeline renderPipeline;
+    private final AudioService audioService;
     private final Runnable restartCallback;
 
     public GameUpdater(
             GameWorld world,
             InputManager input,
             RenderPipeline renderPipeline,
+            AudioService audioService,
             Runnable restartCallback) {
 
         this.world = world;
         this.input = input;
         this.renderPipeline = renderPipeline;
+        this.audioService = audioService;
         this.restartCallback = restartCallback;
     }
 
     public void update() {
-
         processCommands();
-
         world.update();
+        audioService.update();
     }
 
     private void processCommands() {
@@ -60,10 +63,12 @@ public class GameUpdater {
         if (world.getState() == GameState.PLAYING) {
 
             world.setState(GameState.PAUSED);
+            audioService.pauseAll();
 
         } else if (world.getState() == GameState.PAUSED) {
 
             world.setState(GameState.PLAYING);
+            audioService.resumeAll();
         }
     }
 }
