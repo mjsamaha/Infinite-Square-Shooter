@@ -11,6 +11,8 @@ public final class ColorConfig {
 	public static final Color BLACK = new Color(0, 0, 0);
 	public static final Color WHITE = new Color(255, 255, 255);
 	public static final Color DARK_GREY = new Color(30, 30, 30);
+	
+	public static final Color WAVE_ACCENT = new Color(255, 100, 100); // red accent for wave text
 
 	// UI
 	public static final Color HUD_TEXT = WHITE;

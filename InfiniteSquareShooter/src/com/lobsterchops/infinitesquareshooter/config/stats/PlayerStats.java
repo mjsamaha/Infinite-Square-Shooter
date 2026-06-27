@@ -16,10 +16,9 @@ public record PlayerStats(int startingLives, float moveSpeed, long invincibility
 		return new PlayerStats(startingLives, moveSpeed, invincibilityMs, newProjectile, maxLives);
 	}
 
-	/** Returns a copy with additional lives added (clamped to maxLives). */
+	/** Returns a copy with additional lives added. */
 	public PlayerStats withExtraLife() {
-		int newLives = Math.min(startingLives + 1, maxLives);
-		return new PlayerStats(newLives, moveSpeed, invincibilityMs, projectile, maxLives);
+		return new PlayerStats(startingLives + 1, moveSpeed, invincibilityMs, projectile, maxLives);
 	}
 
 }

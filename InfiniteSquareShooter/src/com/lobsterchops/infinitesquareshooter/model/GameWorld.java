@@ -9,227 +9,251 @@ import com.lobsterchops.infinitesquareshooter.combat.DamageSystem;
 import com.lobsterchops.infinitesquareshooter.config.GameConfig;
 import com.lobsterchops.infinitesquareshooter.config.types.EnemyType;
 import com.lobsterchops.infinitesquareshooter.math.Vector2;
+import com.lobsterchops.infinitesquareshooter.model.entity.Boss;
 import com.lobsterchops.infinitesquareshooter.model.entity.Enemy;
 import com.lobsterchops.infinitesquareshooter.model.entity.Player;
 import com.lobsterchops.infinitesquareshooter.score.RunStats;
 import com.lobsterchops.infinitesquareshooter.score.ScoreManager;
 import com.lobsterchops.infinitesquareshooter.state.GameState;
+import com.lobsterchops.infinitesquareshooter.system.BossDeathSystem;
 import com.lobsterchops.infinitesquareshooter.system.EnemyDeathSystem;
+import com.lobsterchops.infinitesquareshooter.system.PowerUpManager;
 import com.lobsterchops.infinitesquareshooter.wave.WaveManager;
 
 public class GameWorld {
 
-	private final List<GameObject> objects = new ArrayList<>();
-	private final List<GameObject> pendingObjects = new ArrayList<>();
-	
-	private final SpawnService spawnService = new SpawnService(this);
-	private final CollisionSystem collisionSystem = new CollisionSystem(new DamageSystem());
-	private final EnemyDeathSystem enemyDeathSystem = new EnemyDeathSystem();
-	
-	private final WaveManager waveManager = new WaveManager(this);
-	private final ScoreManager scoreManager = new ScoreManager();
-	private final RunStats runStats = new RunStats();
+    private final List<GameObject> objects        = new ArrayList<>();
+    private final List<GameObject> pendingObjects = new ArrayList<>();
 
-	private Player player;
-	private GameState state = GameState.PLAYING;
-	private int waveNumber = 1;
-	
-	private long tick;
-	private long elapsedMillis;
+    private final SpawnService    spawnService    = new SpawnService(this);
+    private final CollisionSystem collisionSystem = new CollisionSystem(new DamageSystem());
+    private final EnemyDeathSystem enemyDeathSystem = new EnemyDeathSystem();
+    private final BossDeathSystem  bossDeathSystem  = new BossDeathSystem();
 
-	public void update() {
-		if (state != GameState.PLAYING) {
-			return;
-		}
-		
-		// Process pending objects before the update to ensure they are included in the current tick.
-		beginUpdate();
-		
-		// Update time and meta-systems before updating objects and systems to ensure they have the latest context.
-		updateTime();
-		updateMetaSystems();
-		
-		// Create a single context object to pass to all updates to ensure consistency across the update cycle.
-		UpdateContext context = createContext();
-		
-		// Update all game objects and systems using the same context to ensure they are synchronized with the current tick and elapsed time.
-		updateObjects(context);
-		updateSystems(context);
-		
-		// Process pending objects again after the update to ensure any new objects created during the update are included in the next tick.
-		endUpdate(context);
+    private final WaveManager    waveManager    = new WaveManager(this);
+    private final ScoreManager   scoreManager   = new ScoreManager();
+    private final RunStats       runStats       = new RunStats();
+    private final PowerUpManager powerUpManager = new PowerUpManager();
+
+    private Player    player;
+    private Boss      activeBoss;
+    private GameState state      = GameState.PLAYING;
+    private int       waveNumber = 1;
+
+    private long tick;
+    private long elapsedMillis;
 
 
-	}
-	
-	private void beginUpdate() {
-		flushPendingObjects();
-	}
-	
-	private void endUpdate(UpdateContext context) {
-		flushPendingObjects();
-		removeInactiveObjects();
-	}
-	
-	
-	private void updateTime() {
-		tick++;
-		elapsedMillis += Math.round(
-				GameConfig.MILLIS_PER_SECOND / GameConfig.TARGET_FPS
-			);
-	}
-	
-	private void updateMetaSystems() {
-		runStats.sync(this);
-		scoreManager.tick(elapsedMillis);
-	}
-	
-	private UpdateContext createContext() {
-		return UpdateContext.fixed(this, tick, elapsedMillis);
-	}
-	
-	private void updateObjects(UpdateContext context) {
-		for (GameObject object : objects) {
-			if (object.isActive()) {
-				object.update(context);
-			}
-		}
-	}
-	
-	private void updateSystems(UpdateContext context) {
-		collisionSystem.update(context);
-		enemyDeathSystem.update(context);
-		
-		if (player != null) {
-			player.handleDeath(this);
-		}
-		
-		waveManager.update(context);
-	}
+    public void update() {
+        if (state != GameState.PLAYING) {
+            return;
+        }
 
-	
+        beginUpdate();
+        updateTime();
+        updateMetaSystems();
 
-	public void addObject(GameObject object) {
-		if (object != null) {
-			pendingObjects.add(object);
-		}
-	}
+        UpdateContext context = createContext();
 
-	public void setPlayer(Player player) {
-		this.player = player;
-		addObject(player);
-	}
+        updateObjects(context);
+        updateSystems(context);
 
-	public Player getPlayer() {
-		return player;
-	}
+        endUpdate(context);
+    }
 
-	public SpawnService getSpawnService() {
-		return spawnService;
-	}
+    private void beginUpdate() {
+        flushPendingObjects();
+    }
 
-	public List<GameObject> getObjects() {
-		return Collections.unmodifiableList(objects);
-	}
+    private void endUpdate(UpdateContext context) {
+        flushPendingObjects();
+        removeInactiveObjects();
 
-	public List<Renderable> getRenderableObjects() {
-		List<Renderable> renderables = new ArrayList<>();
+        // Clear the active boss reference once it has been removed from the
+        // object list — WaveManager polls hasActiveBoss() to know when to
+        // advance past the boss wave.
+        if (activeBoss != null && !activeBoss.isActive()) {
+            activeBoss = null;
+        }
+    }
 
-		for (GameObject object : objects) {
-			if (object instanceof Renderable renderable && object.isActive()) {
-				renderables.add(renderable);
-			}
-		}
+    private void updateTime() {
+        tick++;
+        elapsedMillis += Math.round(
+                GameConfig.MILLIS_PER_SECOND / GameConfig.TARGET_FPS
+        );
+    }
 
-		return renderables;
-	}
-	
-	public boolean hasActiveEnemies() {
-		for (GameObject object : objects) {
-			if (object instanceof Enemy && object.isActive()) {
-				return true;
-			}
-		}
+    private void updateMetaSystems() {
+        runStats.sync(this);
+        scoreManager.tick(elapsedMillis);
+        powerUpManager.update(elapsedMillis);
+        scoreManager.setPowerUpMultiplier(powerUpManager.scoreMultiplier());
+    }
 
-		return false;
-	}
+    private UpdateContext createContext() {
+        return UpdateContext.fixed(this, tick, elapsedMillis);
+    }
 
-	public void clear() {
-		objects.clear();
-		pendingObjects.clear();
-		player = null;
-		waveNumber = 1;
-		tick = 0;
-		elapsedMillis = 0;
-		state = GameState.PLAYING;
-		scoreManager.reset();
-		runStats.reset();
-		waveManager.reset(elapsedMillis);
-	}
-	
-	public void spawnTestEnemy() {
-		spawnService.spawnEnemy(
-				EnemyType.BASIC_I,
-				new Vector2 (100f, 100f)
-		);
-	}
-	
+    private void updateObjects(UpdateContext context) {
+        for (GameObject object : objects) {
+            if (object.isActive()) {
+                object.update(context);
+            }
+        }
+    }
+
+    private void updateSystems(UpdateContext context) {
+        collisionSystem.update(context);
+        enemyDeathSystem.update(context);
+        bossDeathSystem.update(context);
+
+        if (player != null) {
+            player.handleDeath(this);
+        }
+
+        waveManager.update(context);
+    }
 
 
-	public GameState getState() {
-		return state;
-	}
+    public void addObject(GameObject object) {
+        if (object != null) {
+            pendingObjects.add(object);
+        }
+    }
 
-	public void setState(GameState state) {
-		this.state = state;
-	}
+    private void flushPendingObjects() {
+        if (pendingObjects.isEmpty()) {
+            return;
+        }
+        objects.addAll(pendingObjects);
+        pendingObjects.clear();
+    }
 
-	public int getWaveNumber() {
-		return waveNumber;
-	}
+    private void removeInactiveObjects() {
+        objects.removeIf(object -> !object.isActive());
+    }
 
-	public void setWaveNumber(int waveNumber) {
-		this.waveNumber = waveNumber;
-	}
 
-	public int getScore() {
-		return scoreManager.getScore();
-	}
+    public boolean hasActiveEnemies() {
+        for (GameObject object : objects) {
+            // Bosses are NOT counted here — wave-clear checks only normal enemies.
+            if (object instanceof Enemy && object.isActive()) {
+                return true;
+            }
+        }
+        return false;
+    }
 
-	public void addScore(int amount) {
-		scoreManager.addBonus(amount);
-	}
+    /**
+     * True while a Boss is alive on the field. WaveManager polls this to know
+     * when to advance past the BOSS wave state.
+     */
+    public boolean hasActiveBoss() {
+        return activeBoss != null && activeBoss.isActive();
+    }
 
-	public ScoreManager getScoreManager() {
-		return scoreManager;
-	}
+    public List<GameObject> getObjects() {
+        return Collections.unmodifiableList(objects);
+    }
 
-	public RunStats getRunStats() {
-		return runStats;
-	}
+    public List<Renderable> getRenderableObjects() {
+        List<Renderable> renderables = new ArrayList<>();
+        for (GameObject object : objects) {
+            if (object instanceof Renderable renderable && object.isActive()) {
+                renderables.add(renderable);
+            }
+        }
+        return renderables;
+    }
 
-	private void flushPendingObjects() {
-		if (pendingObjects.isEmpty()) {
-			return;
-		}
 
-		objects.addAll(pendingObjects);
-		pendingObjects.clear();
-	}
+    public void clear() {
+        objects.clear();
+        pendingObjects.clear();
+        player     = null;
+        activeBoss = null;
+        waveNumber = 1;
+        tick       = 0;
+        elapsedMillis = 0;
+        state = GameState.PLAYING;
+        scoreManager.reset();
+        runStats.reset();
+        waveManager.reset(elapsedMillis);
+        powerUpManager.reset();
+    }
 
-	private void removeInactiveObjects() {
-		objects.removeIf(object -> !object.isActive());
-	}
-	
-	public long getTick() {
-		return tick;
-	}
 
-	public long getElapsedMillis() {
-		return elapsedMillis;
-	}
-	
-	public WaveManager getWaveManager() {
-		return waveManager;
-	}
+    public void setPlayer(Player player) {
+        this.player = player;
+        addObject(player);
+    }
+
+    public Player getPlayer() {
+        return player;
+    }
+
+    public void setActiveBoss(Boss boss) {
+        this.activeBoss = boss;
+    }
+
+    public Boss getActiveBoss() {
+        return activeBoss;
+    }
+
+    public SpawnService getSpawnService() {
+        return spawnService;
+    }
+
+    public GameState getState() {
+        return state;
+    }
+
+    public void setState(GameState state) {
+        this.state = state;
+    }
+
+    public int getWaveNumber() {
+        return waveNumber;
+    }
+
+    public void setWaveNumber(int waveNumber) {
+        this.waveNumber = waveNumber;
+    }
+
+    public int getScore() {
+        return scoreManager.getScore();
+    }
+
+    public void addScore(int amount) {
+        scoreManager.addBonus(amount);
+    }
+
+    public ScoreManager getScoreManager() {
+        return scoreManager;
+    }
+
+    public RunStats getRunStats() {
+        return runStats;
+    }
+
+    public long getTick() {
+        return tick;
+    }
+
+    public long getElapsedMillis() {
+        return elapsedMillis;
+    }
+
+    public WaveManager getWaveManager() {
+        return waveManager;
+    }
+
+    public PowerUpManager getPowerUpManager() {
+        return powerUpManager;
+    }
+
+    public void spawnTestEnemy() {
+        spawnService.spawnEnemy(EnemyType.BASIC_I, new Vector2(100f, 100f));
+    }
 }

@@ -16,6 +16,7 @@ public class ScoreManager {
 	private int score;
 	private int comboCount;
 	private long lastKillAtMs;
+	private float powerUpMultiplier = 1f;
 	
 	/** Awards points for a kill, scaled by the current combo multiplier. */
 	public void addKillScore(int baseValue, long nowMs) {
@@ -26,22 +27,30 @@ public class ScoreManager {
 		comboCount++;
 		lastKillAtMs = nowMs;
 
-		score += Math.round(baseValue * currentMultiplier());
+		addScaled(baseValue, currentMultiplier());
 	}
 	
 	/** Awards a flat bonus for completing a wave. */
 	public void addWaveBonus(int waveNumber) {
-		score += waveNumber * WAVE_BONUS_PER_WAVE;
+		addScaled(waveNumber * WAVE_BONUS_PER_WAVE, 1f);
 	}
 
 	/** Awards a boss's configured score value on defeat. */
 	public void addBossBonus(int bossScoreValue) {
-		score += bossScoreValue;
+		addScaled(bossScoreValue, 1f);
 	}
 
 	/** Adds a flat amount with no combo scaling — for pickups, etc. */
 	public void addBonus(int amount) {
-		score += Math.max(0, amount);
+		addScaled(Math.max(0, amount), 1f);
+	}
+
+	public void setPowerUpMultiplier(float multiplier) {
+		powerUpMultiplier = Math.max(1f, multiplier);
+	}
+
+	public float getPowerUpMultiplier() {
+		return powerUpMultiplier;
 	}
 
 	/** Decays the combo once the kill window has expired. Call once per tick. */
@@ -55,6 +64,11 @@ public class ScoreManager {
 		score = 0;
 		comboCount = 0;
 		lastKillAtMs = 0;
+		powerUpMultiplier = 1f;
+	}
+	
+	private void addScaled(int baseValue, float localMultiplier) {
+		score += Math.round(baseValue * localMultiplier * powerUpMultiplier);
 	}
 
 	public int getScore() {

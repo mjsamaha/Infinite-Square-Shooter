@@ -2,12 +2,15 @@ package com.lobsterchops.infinitesquareshooter.model.entity;
 
 import java.awt.Graphics2D;
 
+import com.lobsterchops.infinitesquareshooter.audio.AudioService;
 import com.lobsterchops.infinitesquareshooter.combat.Team;
 import com.lobsterchops.infinitesquareshooter.combat.TeamMember;
 import com.lobsterchops.infinitesquareshooter.config.ColorConfig;
 import com.lobsterchops.infinitesquareshooter.config.ConfigRegistry;
 import com.lobsterchops.infinitesquareshooter.config.ScreenConfig;
 import com.lobsterchops.infinitesquareshooter.config.stats.PlayerStats;
+import com.lobsterchops.infinitesquareshooter.config.stats.ProjectileStats;
+import com.lobsterchops.infinitesquareshooter.core.ServiceLocator;
 import com.lobsterchops.infinitesquareshooter.input.InputManager;
 import com.lobsterchops.infinitesquareshooter.math.Vector2;
 import com.lobsterchops.infinitesquareshooter.model.Damageable;
@@ -18,120 +21,165 @@ import com.lobsterchops.infinitesquareshooter.state.GameState;
 
 public class Player extends Entity implements Damageable, TeamMember {
 
-	private PlayerStats stats;
-	private InputManager input;
+    private PlayerStats stats;
+    private InputManager input;
 
-	private int lives;
-	private long lastShotTime;
-	private long invincibleUntil;
-	private boolean invincible;
+    AudioService audioService = ServiceLocator.resolve(AudioService.class);
 
-	public Player(Vector2 position, InputManager input) {
-		super(position, 32f, 32f);
-		this.stats = ConfigRegistry.player();
-		this.input = input;
-		this.lives = stats.startingLives();
-	}
+    public static final int MAX_WEAPON_TIER = 8;
 
-	@Override
-	public void update(UpdateContext context) {
-		Vector2 movement = input.movementDirection().multiply(stats.moveSpeed());
-		setVelocity(movement);
+    private int lives;
+    private long lastShotTime;
+    private long invincibleUntil;
+    private boolean invincible;
+    private int weaponTier = 1;
 
-		super.update(context);
+    public Player(Vector2 position, InputManager input) {
+        super(position, 32f, 32f);
+        this.stats = ConfigRegistry.player();
+        this.input = input;
+        this.lives = stats.startingLives();
+    }
 
-		float halfWidth = getWidth() / 2f;
-		float halfHeight = getHeight() / 2f;
+    @Override
+    public void update(UpdateContext context) {
+        float speedMultiplier = context.world().getPowerUpManager().speedMultiplier();
+        Vector2 movement = input.movementDirection().multiply(stats.moveSpeed() * speedMultiplier);
+        setVelocity(movement);
 
-		setPosition(getPosition().clamp(
-				halfWidth,
-				halfHeight,
-				ScreenConfig.WIDTH - halfWidth,
-				ScreenConfig.HEIGHT - halfHeight
-		));
+        super.update(context);
 
-		fireIfReady(context);
+        float halfWidth = getWidth() / 2f;
+        float halfHeight = getHeight() / 2f;
 
-		invincible = context.elapsedMillis() < invincibleUntil;
-	}
+        setPosition(getPosition().clamp(
+                halfWidth,
+                halfHeight,
+                ScreenConfig.WIDTH - halfWidth,
+                ScreenConfig.HEIGHT - halfHeight
+        ));
 
-	private void fireIfReady(UpdateContext context) {
-		long now = context.elapsedMillis();
+        fireIfReady(context);
+        invincible = context.elapsedMillis() < invincibleUntil;
+    }
 
-		if (now - lastShotTime < stats.projectile().cooldownMs()) {
-			return;
-		}
+    private void fireIfReady(UpdateContext context) {
+        long now = context.elapsedMillis();
+        float fireRateMultiplier = context.world().getPowerUpManager().fireRateMultiplier();
+        long effectiveCooldownMs = Math.max(60L, Math.round(stats.projectile().cooldownMs() / fireRateMultiplier));
 
-		Vector2 direction = getPosition().directionTo(input.getMousePosition());
+        if (now - lastShotTime < effectiveCooldownMs) {
+            return;
+        }
 
-		if (direction.length() == 0f) {
-			return;
-		}
+        Vector2 direction = getPosition().directionTo(input.getMousePosition());
 
-		context.spawnService().spawnPlayerProjectile(getPosition(), direction, stats.projectile());
-		context.world().getRunStats().recordShotFired();
-		lastShotTime = now;
-	}
+        if (direction.length() == 0f) {
+            return;
+        }
 
-	@Override
-	public void render(Graphics2D g2) {
-		g2.setColor(invincible ? ColorConfig.PLAYER_INVINCIBLE : ColorConfig.PLAYER);
-		g2.fillRect(
-				Math.round(getBounds().x()),
-				Math.round(getBounds().y()),
-				Math.round(getBounds().width()),
-				Math.round(getBounds().height())
-		);
-	}
+        context.spawnService().spawnPlayerProjectile(getPosition(), direction, resolveProjectileStats());
+        context.world().getRunStats().recordShotFired();
+        lastShotTime = now;
+    }
 
-	@Override
-	public void takeDamage(int damage, UpdateContext context) {
-		long now = context.elapsedMillis();
+    @Override
+    public void render(Graphics2D g2) {
+        g2.setColor(invincible ? ColorConfig.PLAYER_INVINCIBLE : ColorConfig.PLAYER);
+        g2.fillRect(
+                Math.round(getBounds().x()),
+                Math.round(getBounds().y()),
+                Math.round(getBounds().width()),
+                Math.round(getBounds().height())
+        );
+    }
 
-		if (now < invincibleUntil || isDead()) {
-			return;
-		}
+    @Override
+    public void takeDamage(int damage, UpdateContext context) {
+        long now = context.elapsedMillis();
 
-		lives -= damage;
-		invincibleUntil = now + stats.invincibilityMs();
+        if (now < invincibleUntil || isDead()) {
+            return;
+        }
 
-		if (lives <= 0) {
-			lives = 0;
-			markInactive();
-		}
-	}
-	
-	@Override
-	public int getCurrentHp() {
-		return lives;
-	}
+        lives -= damage;
+        invincibleUntil = now + stats.invincibilityMs();
 
-	@Override
-	public int getMaxHp() {
-		return stats.maxLives();
-	}
+        if (lives <= 0) {
+            lives = 0;
+            markInactive();
+        }
+    }
 
-	@Override
-	public boolean isDead() {
-		return lives <= 0;
-	}
-	
-	@Override
-	public Team getTeam() {
-		return Team.PLAYER;
-	}
+    @Override
+    public int getCurrentHp() {
+        return lives;
+    }
 
-	public void applyStats(PlayerStats newStats) {
-		this.stats = newStats;
-	}
+    @Override
+    public int getMaxHp() {
+        return stats.maxLives();
+    }
 
-	public int getLives() {
-		return lives;
-	}
+    @Override
+    public boolean isDead() {
+        return lives <= 0;
+    }
 
-	public void handleDeath(GameWorld world) {
-		if (isDead()) {
-			world.setState(GameState.GAME_OVER);
-		}
-	}
+    @Override
+    public Team getTeam() {
+        return Team.PLAYER;
+    }
+
+    public void applyStats(PlayerStats newStats) {
+        this.stats = newStats;
+    }
+
+    public int getLives() {
+        return lives;
+    }
+
+    public void addLife() {
+        lives++;
+    }
+
+    public void upgradeWeaponTier() {
+        if (weaponTier < MAX_WEAPON_TIER) {
+            weaponTier++;
+        }
+    }
+
+    public int getWeaponTier() {
+        return weaponTier;
+    }
+
+    /**
+     * Resolves the projectile stats to use this frame, factoring in weapon tier.
+     *
+     * Weapon tier directly controls projectile count — no upper limit.
+     * spreadDegrees from base stats controls the fan angle between shots.
+     * All other fields (speed, damage, homing, cooldown) come straight from config.
+     */
+    private ProjectileStats resolveProjectileStats() {
+        ProjectileStats base = stats.projectile();
+
+        // Weapon tier directly controls projectile count, capped at MAX_WEAPON_TIER.
+        int count = Math.min(weaponTier, MAX_WEAPON_TIER);
+
+        return new ProjectileStats(
+                base.speed(),
+                base.damage(),
+                count,
+                base.spreadDegrees(),
+                base.isHoming(),
+                base.homingTurnRate(),
+                base.cooldownMs()
+        );
+    }
+
+    public void handleDeath(GameWorld world) {
+        if (isDead()) {
+            world.setState(GameState.GAME_OVER);
+        }
+    }
 }

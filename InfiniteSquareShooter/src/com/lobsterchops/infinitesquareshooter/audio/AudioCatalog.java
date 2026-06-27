@@ -17,7 +17,7 @@ public final class AudioCatalog {
 		 */
 
 		// Player Related
-		register(defs, SoundType.PLAYER_SHOOT, SoundDefinition.sfx("/audio/background.wav", 0.60f, 4)); // TODO
+		register(defs, SoundType.PLAYER_SHOOT, SoundDefinition.sfx("/sfx/player_shot.wav", 0.60f, 4)); // TODO
 		register(defs, SoundType.PLAYER_HIT, SoundDefinition.sfx("/audio/background.wav", 0.90f, 2)); // TODO
 
 		// Enemy Related
@@ -47,7 +47,7 @@ public final class AudioCatalog {
 		// Music
 		register(defs, SoundType.MUSIC_SPLASH_SCREEN, SoundDefinition.music("/audio/background.wav", 0.75f)); // TODO
 		register(defs, SoundType.MUSIC_MENU, SoundDefinition.music("/audio/background.wav", 0.75f)); // TODO
-		register(defs, SoundType.MUSIC_GAMEPLAY, SoundDefinition.music("/audio/background.wav", 0.75f));
+		register(defs, SoundType.MUSIC_GAMEPLAY, SoundDefinition.music("/audio/gameplay_music_two.wav", 0.75f));
 		register(defs, SoundType.MUSIC_BOSS, SoundDefinition.music("/audio/background.wav", 0.75f)); // TODO
 
 		// all enum values must be registered

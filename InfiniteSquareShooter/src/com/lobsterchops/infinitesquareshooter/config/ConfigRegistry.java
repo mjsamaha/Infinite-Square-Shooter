@@ -47,60 +47,57 @@ import com.lobsterchops.infinitesquareshooter.config.types.EnemyType;
  */
 public final class ConfigRegistry {
 
-	// Enemy Map
-	private static final Map<EnemyType, EnemyStats> ENEMY_MAP;
+    // Enemy Map
+    private static final Map<EnemyType, EnemyStats> ENEMY_MAP;
 
-	static {
-		ENEMY_MAP = new EnumMap<>(EnemyType.class);
-		for (EnemyType type : EnemyType.values()) {
-			ENEMY_MAP.put(type, type.getStats());
-		}
-	}
+    static {
+        ENEMY_MAP = new EnumMap<>(EnemyType.class);
+        for (EnemyType type : EnemyType.values()) {
+            ENEMY_MAP.put(type, type.getStats());
+        }
+    }
 
-	/** Returns the full enemy stats map. Unmodifiable view. */
-	public static Map<EnemyType, EnemyStats> enemies() {
-		return java.util.Collections.unmodifiableMap(ENEMY_MAP);
-	}
+    public static Map<EnemyType, EnemyStats> enemies() {
+        return java.util.Collections.unmodifiableMap(ENEMY_MAP);
+    }
 
-	/** Returns stats for a specific enemy type. */
-	public static EnemyStats enemy(EnemyType type) {
-		return ENEMY_MAP.get(type);
-	}
+    public static EnemyStats enemy(EnemyType type) {
+        return ENEMY_MAP.get(type);
+    }
 
-	// Boss Map
-	private static final Map<BossType, BossStats> BOSS_MAP;
+    // Boss Map
+    private static final Map<BossType, BossStats> BOSS_MAP;
 
-	static {
-		BOSS_MAP = new EnumMap<>(BossType.class);
-		for (BossType type : BossType.values()) {
-			BOSS_MAP.put(type, type.getStats());
-		}
-	}
+    static {
+        BOSS_MAP = new EnumMap<>(BossType.class);
+        for (BossType type : BossType.values()) {
+            BOSS_MAP.put(type, type.getStats());
+        }
+    }
 
-	/** Returns the full boss stats map. Unmodifiable view. */
-	public static Map<BossType, BossStats> bosses() {
-		return java.util.Collections.unmodifiableMap(BOSS_MAP);
-	}
+    public static Map<BossType, BossStats> bosses() {
+        return java.util.Collections.unmodifiableMap(BOSS_MAP);
+    }
 
-	/** Returns stats for a specific boss type. */
-	public static BossStats boss(BossType type) {
-		return BOSS_MAP.get(type);
-	}
+    public static BossStats boss(BossType type) {
+        return BOSS_MAP.get(type);
+    }
 
-	// Player Map
-	private static final PlayerStats PLAYER_STATS = new PlayerStats(3, // startingLives
-			5.0f, // moveSpeed
-			1500L, // invincibilityMs
-			ProjectileStats.single(10f, 1, 150L), // default projectile
-			5 // maxLives (power-up cap)
-	);
+    // Player stats
+    // spreadDegrees=15f means tier-2 fires two shots 15° apart, tier-3 three shots
+    // 15° apart, tier-4 four shots 15° apart — visually distinct and satisfying.
+    private static final PlayerStats PLAYER_STATS = new PlayerStats(
+            3,                                              // startingLives
+            5.0f,                                           // moveSpeed
+            1500L,                                          // invincibilityMs
+            new ProjectileStats(10f, 1, 1, 15f, false, 0f, 150L), // projectile
+            10                                               // maxLives
+    );
 
-	/** Returns the player's base stats. */
-	public static PlayerStats player() {
-		return PLAYER_STATS;
-	}
+    public static PlayerStats player() {
+        return PLAYER_STATS;
+    }
 
-	private ConfigRegistry() {
-	}
-
+    private ConfigRegistry() {
+    }
 }

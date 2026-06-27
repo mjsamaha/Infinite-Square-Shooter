@@ -204,17 +204,37 @@ public final class WaveCatalog {
 		return endlessWave(waveNumber);
 	}
 
+	/**
+	 * Returns the boss that should spawn after the given wave number, or
+	 * {@code null} if no boss is scheduled.
+	 *
+	 * <p>The five bosses cycle every 60 waves so all of them appear in both
+	 * story mode (waves 12-36) and endless mode (waves 48, 60, then 72, 84 …
+	 * repeating the whole sequence):</p>
+	 * <pre>
+	 *   Wave 12 / 72 / 132 … → Swarm Queen
+	 *   Wave 24 / 84 / 144 … → Fortress
+	 *   Wave 36 / 96 / 156 … → Splitter King
+	 *   Wave 48 / 108 / 168 … → Phantom
+	 *   Wave 60 / 120 / 180 … → Mimic
+	 * </pre>
+	 */
 	public static BossType getBossAfterWave(int waveNumber) {
-		return switch (waveNumber) {
+		// Normalise into a 1-60 cycle so all five bosses repeat in endless mode.
+		int effective = ((waveNumber - 1) % 60) + 1;
+		return switch (effective) {
 			case 12 -> BossType.SWARM_QUEEN;
 			case 24 -> BossType.FORTRESS;
 			case 36 -> BossType.SPLITTER_KING;
+			case 48 -> BossType.PHANTOM;
+			case 60 -> BossType.MIMIC;
 			default -> null;
 		};
 	}
 
+	/** True when a boss is scheduled after the given wave number. */
 	public static boolean shouldTriggerBossAfter(int waveNumber) {
-		return waveNumber > 0 && waveNumber % 12 == 0 && waveNumber <= FINAL_STORY_WAVE;
+		return getBossAfterWave(waveNumber) != null;
 	}
 
 	public static boolean isFinalStoryWave(int waveNumber) {
