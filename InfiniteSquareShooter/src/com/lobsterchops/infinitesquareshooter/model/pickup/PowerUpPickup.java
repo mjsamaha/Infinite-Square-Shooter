@@ -1,6 +1,7 @@
 package com.lobsterchops.infinitesquareshooter.model.pickup;
 
 import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
 
 import com.lobsterchops.infinitesquareshooter.config.ColorConfig;
 import com.lobsterchops.infinitesquareshooter.config.types.PowerUpType;
@@ -8,6 +9,7 @@ import com.lobsterchops.infinitesquareshooter.math.Vector2;
 import com.lobsterchops.infinitesquareshooter.model.GameWorld;
 import com.lobsterchops.infinitesquareshooter.model.Pickup;
 import com.lobsterchops.infinitesquareshooter.model.entity.Player;
+import com.lobsterchops.infinitesquareshooter.utils.SpriteRegistry;
 
 public class PowerUpPickup extends Pickup {
 
@@ -33,13 +35,26 @@ public class PowerUpPickup extends Pickup {
 
 	@Override
 	public void render(Graphics2D g2) {
-		g2.setColor(resolveColor(type));
-		g2.fillOval(
-				Math.round(getBounds().x()),
-				Math.round(getBounds().y()),
-				Math.round(getBounds().width()),
-				Math.round(getBounds().height())
-		);
+	    BufferedImage sprite = SpriteRegistry.forPowerUp(type);
+
+	    if (sprite != null) {
+	        g2.drawImage(
+	            sprite,
+	            Math.round(getBounds().x()),
+	            Math.round(getBounds().y()),
+	            Math.round(getBounds().width()),
+	            Math.round(getBounds().height()),
+	            null
+	        );
+	    } else {
+	        g2.setColor(resolveColor(type));
+	        g2.fillOval(
+	            Math.round(getBounds().x()),
+	            Math.round(getBounds().y()),
+	            Math.round(getBounds().width()),
+	            Math.round(getBounds().height())
+	        );
+	    }
 	}
 
 	public PowerUpType getType() {

@@ -11,6 +11,7 @@ import com.lobsterchops.infinitesquareshooter.model.GameWorld;
 import com.lobsterchops.infinitesquareshooter.model.entity.Player;
 import com.lobsterchops.infinitesquareshooter.render.DebugMetrics;
 import com.lobsterchops.infinitesquareshooter.render.RenderPipeline;
+import com.lobsterchops.infinitesquareshooter.utils.SpriteRegistry;
 
 public class GameContext {
 
@@ -38,6 +39,8 @@ public class GameContext {
         ServiceLocator.register(RenderPipeline.class, renderPipeline);
         ServiceLocator.register(AudioService.class,  audioService);
         ServiceLocator.register(GameUpdater.class,   updater);
+        
+        SpriteRegistry.load();
     }
 
     public void setupNewRun() {

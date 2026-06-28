@@ -2,6 +2,7 @@ package com.lobsterchops.infinitesquareshooter.model.entity;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
 
 import com.lobsterchops.infinitesquareshooter.config.ColorConfig;
 import com.lobsterchops.infinitesquareshooter.config.ConfigRegistry;
@@ -9,6 +10,7 @@ import com.lobsterchops.infinitesquareshooter.config.stats.BossStats;
 import com.lobsterchops.infinitesquareshooter.config.types.BossType;
 import com.lobsterchops.infinitesquareshooter.math.Vector2;
 import com.lobsterchops.infinitesquareshooter.model.UpdateContext;
+import com.lobsterchops.infinitesquareshooter.utils.SpriteRegistry;
 
 /**
  * The Splitter King — third boss, end of Act 3 (after wave 36).
@@ -167,21 +169,23 @@ public class SplitterKingBoss extends Boss {
         int w = Math.round(getBounds().width());
         int h = Math.round(getBounds().height());
 
-        // Body — slightly lighter per tier to show hierarchy.
-        Color body = switch (tier) {
-            case 0  -> ColorConfig.BOSS_SPLITTER_KING;
-            case 1  -> ColorConfig.BOSS_SPLITTER_KING.brighter();
-            default -> ColorConfig.BOSS_SPLITTER_KING.brighter().brighter();
-        };
+        BufferedImage sprite = SpriteRegistry.forBoss(BossType.SPLITTER_KING);
 
-        g2.setColor(body);
-        g2.fillRect(x, y, w, h);
+        if (sprite != null) {
+            g2.drawImage(sprite, x, y, w, h, null);
+        } else {
+            Color body = switch (tier) {
+                case 0  -> ColorConfig.BOSS_SPLITTER_KING;
+                case 1  -> ColorConfig.BOSS_SPLITTER_KING.brighter();
+                default -> ColorConfig.BOSS_SPLITTER_KING.brighter().brighter();
+            };
+            g2.setColor(body);
+            g2.fillRect(x, y, w, h);
+            g2.setColor(body.darker());
+            g2.drawRect(x, y, w, h);
+        }
 
-        // Border.
-        g2.setColor(body.darker());
-        g2.drawRect(x, y, w, h);
-
-        // Tier label centred in the body.
+        // Tier label always drawn on top.
         String label = switch (tier) {
             case 0  -> "I";
             case 1  -> "II";

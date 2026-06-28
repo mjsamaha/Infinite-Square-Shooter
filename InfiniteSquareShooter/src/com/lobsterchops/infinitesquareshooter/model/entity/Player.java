@@ -1,6 +1,7 @@
 package com.lobsterchops.infinitesquareshooter.model.entity;
 
 import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
 
 import com.lobsterchops.infinitesquareshooter.audio.AudioService;
 import com.lobsterchops.infinitesquareshooter.combat.Team;
@@ -18,6 +19,7 @@ import com.lobsterchops.infinitesquareshooter.model.Entity;
 import com.lobsterchops.infinitesquareshooter.model.GameWorld;
 import com.lobsterchops.infinitesquareshooter.model.UpdateContext;
 import com.lobsterchops.infinitesquareshooter.state.GameState;
+import com.lobsterchops.infinitesquareshooter.utils.SpriteRegistry;
 
 public class Player extends Entity implements Damageable, TeamMember {
 
@@ -26,7 +28,7 @@ public class Player extends Entity implements Damageable, TeamMember {
 
     AudioService audioService = ServiceLocator.resolve(AudioService.class);
 
-    public static final int MAX_WEAPON_TIER = 8;
+    public static final int MAX_WEAPON_TIER = 6;
 
     private int lives;
     private long lastShotTime;
@@ -85,13 +87,28 @@ public class Player extends Entity implements Damageable, TeamMember {
 
     @Override
     public void render(Graphics2D g2) {
-        g2.setColor(invincible ? ColorConfig.PLAYER_INVINCIBLE : ColorConfig.PLAYER);
-        g2.fillRect(
+        BufferedImage sprite = invincible
+            ? SpriteRegistry.forPlayer(true)
+            : SpriteRegistry.forPlayer(false);
+
+        if (sprite != null) {
+            g2.drawImage(
+                sprite,
+                Math.round(getBounds().x()),
+                Math.round(getBounds().y()),
+                Math.round(getBounds().width()),
+                Math.round(getBounds().height()),
+                null
+            );
+        } else {
+            g2.setColor(invincible ? ColorConfig.PLAYER_INVINCIBLE : ColorConfig.PLAYER);
+            g2.fillRect(
                 Math.round(getBounds().x()),
                 Math.round(getBounds().y()),
                 Math.round(getBounds().width()),
                 Math.round(getBounds().height())
-        );
+            );
+        }
     }
 
     @Override

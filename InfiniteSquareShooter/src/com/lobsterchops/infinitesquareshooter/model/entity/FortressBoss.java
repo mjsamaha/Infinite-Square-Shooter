@@ -2,6 +2,7 @@ package com.lobsterchops.infinitesquareshooter.model.entity;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,6 +22,7 @@ import com.lobsterchops.infinitesquareshooter.model.GameObject;
 import com.lobsterchops.infinitesquareshooter.model.Renderable;
 import com.lobsterchops.infinitesquareshooter.model.UpdateContext;
 import com.lobsterchops.infinitesquareshooter.render.RenderLayer;
+import com.lobsterchops.infinitesquareshooter.utils.SpriteRegistry;
 
 /**
  * The Fortress — second boss, end of Act 2 (after wave 24).
@@ -151,34 +153,37 @@ public class FortressBoss extends Boss {
 
 	@Override
 	protected void renderBoss(Graphics2D g2) {
-		int x = Math.round(getBounds().x());
-		int y = Math.round(getBounds().y());
-		int w = Math.round(getBounds().width());
-		int h = Math.round(getBounds().height());
+	    int x = Math.round(getBounds().x());
+	    int y = Math.round(getBounds().y());
+	    int w = Math.round(getBounds().width());
+	    int h = Math.round(getBounds().height());
 
-		// Draw connector lines from core centre to each living turret.
-		g2.setColor(ColorConfig.BOSS_FORTRESS.darker());
-		int cx = Math.round(getPosition().x());
-		int cy = Math.round(getPosition().y());
-		for (FortressTurret turret : turrets) {
-			if (turret.isActive()) {
-				g2.drawLine(cx, cy, Math.round(turret.getPosition().x()), Math.round(turret.getPosition().y()));
-			}
-		}
+	    // Connector lines first — behind the core body.
+	    g2.setColor(ColorConfig.BOSS_FORTRESS.darker());
+	    int cx = Math.round(getPosition().x());
+	    int cy = Math.round(getPosition().y());
+	    for (FortressTurret turret : turrets) {
+	        if (turret.isActive()) {
+	            g2.drawLine(cx, cy, Math.round(turret.getPosition().x()), Math.round(turret.getPosition().y()));
+	        }
+	    }
 
-		// Core body.
-		g2.setColor(ColorConfig.BOSS_FORTRESS);
-		g2.fillRect(x, y, w, h);
+	    BufferedImage sprite = SpriteRegistry.forBoss(BossType.FORTRESS);
 
-		// Invulnerable overlay — dark tint while turrets are alive.
-		if (hasLivingTurrets()) {
-			g2.setColor(new Color(0, 0, 0, 120));
-			g2.fillRect(x, y, w, h);
-		}
+	    if (sprite != null) {
+	        g2.drawImage(sprite, x, y, w, h, null);
+	    } else {
+	        g2.setColor(ColorConfig.BOSS_FORTRESS);
+	        g2.fillRect(x, y, w, h);
+	        g2.setColor(ColorConfig.BOSS_FORTRESS.darker());
+	        g2.drawRect(x, y, w, h);
+	    }
 
-		// Core border.
-		g2.setColor(ColorConfig.BOSS_FORTRESS.darker());
-		g2.drawRect(x, y, w, h);
+	    // Invulnerable overlay on top of sprite while turrets are alive.
+	    if (hasLivingTurrets()) {
+	        g2.setColor(new Color(0, 0, 0, 120));
+	        g2.fillRect(x, y, w, h);
+	    }
 	}
 
 	/**

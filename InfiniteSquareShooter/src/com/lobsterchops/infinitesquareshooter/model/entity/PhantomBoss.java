@@ -2,6 +2,7 @@ package com.lobsterchops.infinitesquareshooter.model.entity;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
 
 import com.lobsterchops.infinitesquareshooter.config.ColorConfig;
 import com.lobsterchops.infinitesquareshooter.config.ScreenConfig;
@@ -9,6 +10,7 @@ import com.lobsterchops.infinitesquareshooter.config.stats.BossStats;
 import com.lobsterchops.infinitesquareshooter.config.types.BossType;
 import com.lobsterchops.infinitesquareshooter.math.Vector2;
 import com.lobsterchops.infinitesquareshooter.model.UpdateContext;
+import com.lobsterchops.infinitesquareshooter.utils.SpriteRegistry;
 
 /**
  * The Phantom — fourth boss.
@@ -204,29 +206,36 @@ public class PhantomBoss extends Boss {
         int w = Math.round(getBounds().width());
         int h = Math.round(getBounds().height());
 
-        int alpha = switch (cycleState) {
-            case IDLE      -> 13;   //  ~5% opacity
-            case TELEGRAPH -> 255;  // 100% opacity
-            case ATTACK    -> 153;  //  60% opacity
+        float alpha = switch (cycleState) {
+            case IDLE      -> 0.05f;
+            case TELEGRAPH -> 1.00f;
+            case ATTACK    -> 0.60f;
         };
 
-        Color body = new Color(
-                ColorConfig.BOSS_PHANTOM.getRed(),
-                ColorConfig.BOSS_PHANTOM.getGreen(),
-                ColorConfig.BOSS_PHANTOM.getBlue(),
-                alpha
-        );
+        BufferedImage sprite = SpriteRegistry.forBoss(BossType.PHANTOM);
 
-        g2.setColor(body);
-        g2.fillRect(x, y, w, h);
+        if (sprite != null) {
+            java.awt.Composite original = g2.getComposite();
+            g2.setComposite(java.awt.AlphaComposite.getInstance(java.awt.AlphaComposite.SRC_OVER, alpha));
+            g2.drawImage(sprite, x, y, w, h, null);
+            g2.setComposite(original);
+        } else {
+            int alphaInt = Math.round(alpha * 255);
+            g2.setColor(new Color(
+                    ColorConfig.BOSS_PHANTOM.getRed(),
+                    ColorConfig.BOSS_PHANTOM.getGreen(),
+                    ColorConfig.BOSS_PHANTOM.getBlue(),
+                    alphaInt));
+            g2.fillRect(x, y, w, h);
+        }
 
-        // Bright border pulse during telegraph to maximise visibility.
+        // Telegraph pulse always drawn — critical gameplay signal.
         if (cycleState == CycleState.TELEGRAPH) {
             g2.setColor(new Color(255, 255, 255, 220));
             g2.drawRect(x,     y,     w,     h    );
             g2.drawRect(x + 1, y + 1, w - 2, h - 2);
             g2.drawRect(x + 2, y + 2, w - 4, h - 4);
-        } else {
+        } else if (sprite == null) {
             g2.setColor(ColorConfig.BOSS_PHANTOM.darker());
             g2.drawRect(x, y, w, h);
         }

@@ -1,6 +1,7 @@
 package com.lobsterchops.infinitesquareshooter.model.entity;
 
 import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
 
 import com.lobsterchops.infinitesquareshooter.combat.ScoreValue;
 import com.lobsterchops.infinitesquareshooter.combat.Team;
@@ -14,6 +15,7 @@ import com.lobsterchops.infinitesquareshooter.model.Damageable;
 import com.lobsterchops.infinitesquareshooter.model.Entity;
 import com.lobsterchops.infinitesquareshooter.model.UpdateContext;
 import com.lobsterchops.infinitesquareshooter.system.EnemyBehaviorSystem;
+import com.lobsterchops.infinitesquareshooter.utils.SpriteRegistry;
 
 public class Enemy extends Entity implements Damageable, TeamMember, ScoreValue {
 
@@ -52,13 +54,28 @@ public class Enemy extends Entity implements Damageable, TeamMember, ScoreValue 
 
 	@Override
 	public void render(Graphics2D g2) {
-		if (invisible) {
-			return;
-		}
+	    if (invisible) return;
 
-		g2.setColor(resolveColor());
-		g2.fillRect(Math.round(getBounds().x()), Math.round(getBounds().y()), Math.round(getBounds().width()),
-				Math.round(getBounds().height()));
+	    BufferedImage sprite = SpriteRegistry.forEnemy(type);
+
+	    if (sprite != null) {
+	        g2.drawImage(
+	            sprite,
+	            Math.round(getBounds().x()),
+	            Math.round(getBounds().y()),
+	            Math.round(getBounds().width()),
+	            Math.round(getBounds().height()),
+	            null
+	        );
+	    } else {
+	        g2.setColor(resolveColor());
+	        g2.fillRect(
+	            Math.round(getBounds().x()),
+	            Math.round(getBounds().y()),
+	            Math.round(getBounds().width()),
+	            Math.round(getBounds().height())
+	        );
+	    }
 	}
 
 	@Override

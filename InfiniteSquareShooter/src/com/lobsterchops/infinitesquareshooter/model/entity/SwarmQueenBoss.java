@@ -2,6 +2,7 @@ package com.lobsterchops.infinitesquareshooter.model.entity;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
 
 import com.lobsterchops.infinitesquareshooter.config.ColorConfig;
 import com.lobsterchops.infinitesquareshooter.config.ScreenConfig;
@@ -10,6 +11,7 @@ import com.lobsterchops.infinitesquareshooter.config.types.BossType;
 import com.lobsterchops.infinitesquareshooter.config.types.EnemyType;
 import com.lobsterchops.infinitesquareshooter.math.Vector2;
 import com.lobsterchops.infinitesquareshooter.model.UpdateContext;
+import com.lobsterchops.infinitesquareshooter.utils.SpriteRegistry;
 
 /**
  * The Swarm Queen — first boss, end of Act 1 (after wave 12).
@@ -175,40 +177,39 @@ public class SwarmQueenBoss extends Boss {
         int w = Math.round(getBounds().width());
         int h = Math.round(getBounds().height());
 
-        // Body.
-        g2.setColor(ColorConfig.BOSS_SWARM_QUEEN);
-        g2.fillRect(x, y, w, h);
+        BufferedImage sprite = SpriteRegistry.forBoss(BossType.SWARM_QUEEN);
 
-        // Shell border.
+        if (sprite != null) {
+            g2.drawImage(sprite, x, y, w, h, null);
+        } else {
+            g2.setColor(ColorConfig.BOSS_SWARM_QUEEN);
+            g2.fillRect(x, y, w, h);
+        }
+
+        // Shell indicators drawn on top of sprite or color — always needed.
         int borderThickness = shellOpen ? BORDER_OPEN : BORDER_CLOSED;
         Color shellColor = shellOpen
                 ? ColorConfig.BOSS_SWARM_QUEEN.darker()
                 : ColorConfig.BOSS_SWARM_QUEEN.darker().darker();
 
         g2.setColor(shellColor);
-        // Top
         g2.fillRect(x, y, w, borderThickness);
-        // Left
         g2.fillRect(x, y, borderThickness, h);
-        // Right
         g2.fillRect(x + w - borderThickness, y, borderThickness, h);
-        // Bottom — omit centre section when open to show the gap.
+
         if (shellOpen) {
             int gapWidth  = w / 3;
             int gapStartX = x + (w - gapWidth) / 2;
             g2.fillRect(x, y + h - borderThickness, gapStartX - x, borderThickness);
             g2.fillRect(gapStartX + gapWidth, y + h - borderThickness,
                     x + w - (gapStartX + gapWidth), borderThickness);
-        } else {
-            g2.fillRect(x, y + h - borderThickness, w, borderThickness);
-        }
 
-        // Weak-point pulse when open.
-        if (shellOpen) {
             int cx = x + w / 2 - WEAK_POINT_SIZE / 2;
             int cy = y + h / 2 - WEAK_POINT_SIZE / 2;
             g2.setColor(new Color(255, 220, 80, 200));
             g2.fillOval(cx, cy, WEAK_POINT_SIZE, WEAK_POINT_SIZE);
+        } else {
+            g2.fillRect(x, y + h - borderThickness, w, borderThickness);
         }
     }
 }

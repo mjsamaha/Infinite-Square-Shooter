@@ -1,6 +1,7 @@
 package com.lobsterchops.infinitesquareshooter.model.projectile;
 
 import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
 
 import com.lobsterchops.infinitesquareshooter.combat.DamageSource;
 import com.lobsterchops.infinitesquareshooter.combat.Team;
@@ -9,6 +10,7 @@ import com.lobsterchops.infinitesquareshooter.model.Damageable;
 import com.lobsterchops.infinitesquareshooter.model.Entity;
 import com.lobsterchops.infinitesquareshooter.model.UpdateContext;
 import com.lobsterchops.infinitesquareshooter.render.RenderLayer;
+import com.lobsterchops.infinitesquareshooter.utils.SpriteRegistry;
 
 public class Projectile extends Entity implements DamageSource {
 
@@ -66,13 +68,46 @@ public class Projectile extends Entity implements DamageSource {
 
 	@Override
 	public void render(Graphics2D g2) {
-		g2.setColor(ProjectileVisualResolver.colorFor(this));
-		g2.fillOval(
-				Math.round(getBounds().x()),
-				Math.round(getBounds().y()),
-				Math.round(getBounds().width()),
-				Math.round(getBounds().height())
-		);
+	    if (getOwner() == ProjectileOwner.PLAYER) {
+	        BufferedImage sprite = SpriteRegistry.forPlayerProjectile();
+
+	        if (sprite != null) {
+	            g2.drawImage(
+	                sprite,
+	                Math.round(getBounds().x()),
+	                Math.round(getBounds().y()),
+	                Math.round(getBounds().width()),
+	                Math.round(getBounds().height()),
+	                null
+	            );
+	            return;
+	        }
+	    }
+
+	    if (getOwner() == ProjectileOwner.ENEMY && !isHoming()) {
+	        BufferedImage sprite = SpriteRegistry.forEnemyProjectile();
+
+	        if (sprite != null) {
+	            g2.drawImage(
+	                sprite,
+	                Math.round(getBounds().x()),
+	                Math.round(getBounds().y()),
+	                Math.round(getBounds().width()),
+	                Math.round(getBounds().height()),
+	                null
+	            );
+	            return;
+	        }
+	    }
+
+	    // Fallback for homing, neutral, or any missing sprite
+	    g2.setColor(ProjectileVisualResolver.colorFor(this));
+	    g2.fillOval(
+	        Math.round(getBounds().x()),
+	        Math.round(getBounds().y()),
+	        Math.round(getBounds().width()),
+	        Math.round(getBounds().height())
+	    );
 	}
 
 	@Override
